@@ -1,0 +1,282 @@
+{% extends 'patient/layout.html' %}
+{% block body %}
+<div class="row justify-content-center align-items-center">
+    <div class="col-lg-10 border rounded m-3">
+        <div class="patient-registrion m-3">
+            <h2>Patient Registration Form</h2>
+            <form method="POST" id="patient_register" action="{% url 'patient:patient_register' %}">
+                {% csrf_token %}
+
+                <!-- Fist Name -->
+                <div class="mb-3">
+                    <label class="form-label" for="fnameText">First Name</label>
+                    <input type="text" name="fname" class="form-control" id="fnameText" placeholder="Enter your first name" value="{{fname}}">
+                </div>
+
+                <!-- Last Name -->
+                <div class="mb-3">
+                    <label for="form-label" for="lnameText">Last Name</label>
+                    <input type="text" name="lname" class="form-control" id="lnameText" placeholder="Enter your last name" value="{{lname}}">
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="mb-3">
+                    <label class="form-label" for="dateofBirth">Date of Birth</label>
+                    <input type="date" name="date_of_birth" class="form-control" id="dobDate" placeholder="Date of Birth" value="{{date_of_birth}}">
+                </div>
+
+                <!-- Gender -->
+                <div class="mb-3">
+                    <label class="form-label" for="gender">Gender</label>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="gender" id="maleRadio" value="M">
+                        <label for="maleRadio">Male</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="gender" id="femaleRadio" value="F">
+                        <label for="femaleRadio">Female</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="gender" id="otherRadio" value="O">
+                        <label for="otherRadio">Other</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="gender" id="preferRadio" value="P">
+                        <label for="preferRadio">Prefer not to say</label>
+                    </div>
+                </div>
+
+                <!-- Marital Status -->
+                <div class="mb-3">
+                    <label for="marital_status" class="form-label">Select Marital Status</label>
+                    <div class="">
+                        <select name="marital_status" id="marital_status">
+                            <option value="U">Unmarried</option>
+                            <option value="M">Married</option>
+                            <option value="P">Prefer not to say</option>
+                        </select>
+                    </div>
+                    
+                </div>
+
+
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label class="form-label" for="phone">Phone Number</label>
+                    <input type="text" class="form-control" id="phoneText" name="phone" placeholder="Enter your phone number" value="{{phone}}">
+                </div>
+
+                <!-- #Email -->
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" name="email" class="form-control" id="exampleInputEmail1" value="{{email}}" aria-describedby="emailHelp">
+                </div>
+
+                <!-- Address -->
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <textarea class="form-control"  name="address" id="addressText" rows="3">{{address}}</textarea>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" name="password" class="form-control" id="passwordInput" value="{{password}}">
+                    <!-- Indicate Password Strength -->
+                    <div id="password-strength" class="mt-1"></div>
+                    <div class="validation-message">
+                        <small>Password must be at least 8 characters with uppercase, lowercase, number and special character.</small>
+                    </div>
+                </div>
+                
+                <!-- Confirm Password -->
+                <div class="mb-3">
+                    <label class="form-label" for="re-password">Confirm Password</label>
+                    <input type="password" class="form-control" id="re-passwordInput">
+                    <div class="password-match" id="password-match"></div>
+                </div>
+
+                
+
+                <!-- Agreee Terms and Conditions -->
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="checkAgree">
+                    <label class="form-check-label" for="exampleCheck1">Agree Terms and Conditions</label>
+                </div>
+                <button type="submit" class="btn btn-primary" id="btnSubmit" disabled>Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+    
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+              
+        // Agree Terms and Conditions
+        const form = document.querySelector('#patient_register')
+        const agree = document.querySelector('#checkAgree');
+
+        form.onsubmit = function(event){
+            if(!agree.checked){
+                event.preventDefault();
+                alert("Please agree Terms and Condtions")
+            }
+        }
+        
+
+        //////////////////////////////////////////////////////
+        // Checking Password Strength and Matching
+
+        const passwordInput = document.querySelector('#passwordInput');
+        const confirmPassword = document.querySelector('#re-passwordInput');
+        const passwordStrength = document.querySelector('#password-strength');
+        const passwordMatch = document.querySelector('#password-match');
+        const submitButton = document.querySelector('#btnSubmit');
+        const registerForm = document.querySelector('form')
+
+        // Checking Password Strength
+        function checkPasswordStrength(password){
+
+            let strength = 0;
+            let feedback = [];
+
+            // Length 
+            if(password.length >= 8){
+                strength++;
+            }else{
+                feedback.push('At least 8 characters')
+            }
+
+            // uppercase
+            if(/[A-Z]/.test(password)){
+                strength++;
+            }else{
+                feedback.push('One Uppercase')
+            }
+
+            // Lowercase
+            if(/[a-z]/.test(password)){
+                strength++;
+            }else{
+                feedback.push('One Lowercase');
+            }
+
+            // Number
+            if(/[\d]/.test(password)){
+                strength++;
+            }else{
+                feedback.push('One number')
+            }
+
+            // Special Character
+            if(/[^A-Za-z0-9]/.test(password)){
+                strength++;
+            }else{
+                feedback.push('One Special Character')
+            }
+
+            return {strength, feedback};
+
+        }
+
+        // Password Strength Display
+        function updatePasswordStrength(){
+
+            const pwd = passwordInput.value;
+            const result = checkPasswordStrength(pwd);
+
+            if(pwd.length === 0){
+                passwordStrength.innerHTML='';
+                return false;
+            }
+
+            let strengthText = '';
+            let strengthClass = '';
+            let isStrong = false;
+
+            if(result.strength <= 2){
+                strengthClass = 'strength-weak text-danger';
+                strengthText = 'Weak';
+                isStrong = false;
+            }
+            else if(result.strength <=4){
+                strengthClass = 'strength-medium text-warning'; 
+                strengthText = 'Medium';
+                isStrong = false;
+            }
+            else{
+                strengthClass = 'strength-strong text-success';
+                strengthText = 'Strong';
+                isStrong = true;
+            }
+            passwordStrength.innerHTML = `<div class="${strengthClass}">
+                                                Password Strength: ${strengthText}
+                                                <small class='text-danger'>${result.feedback.length > 0 ? `<br> ${result.feedback.join(', ')}` : ''}</small>
+                                            </div>`;
+
+            return isStrong;
+        }
+
+        // Check Password Match
+        function checkPasswordMatch(){
+            const pwd = passwordInput.value;
+            const re_pwd = confirmPassword.value;
+
+            if(re_pwd.length === 0){
+                passwordMatch.innerHTML='';
+                return false;
+            }
+
+            if(pwd === re_pwd){
+                passwordMatch.innerHTML= `<div class='pwd_match text-success'>
+                                            <small>Passwords match</small>
+                                        </div>`;
+                return true;
+            }
+            else{
+                passwordMatch.innerHTML= `<div class='pwd_match text-danger'>
+                                            <small>Passwords don't match</small>
+                                        <div>`;
+                return false;
+            }
+        }
+        // Enable/Disable Submit Button
+        function updateSubmitButton(){
+            const isPasswordStrong = updatePasswordStrength();
+            const isPasswordMatch = checkPasswordMatch();
+
+            submitButton.disabled = !(isPasswordStrong && isPasswordMatch);
+        }
+
+        // Add Listener
+        
+        passwordInput.addEventListener('input', function(){
+            updatePasswordStrength();
+            updateSubmitButton();
+        });
+        confirmPassword.addEventListener('input', function(){
+            checkPasswordMatch();
+            updateSubmitButton();
+        });
+        agree.addEventListener('change', function(){
+                updateSubmitButton();
+            }); 
+        
+        registerForm.addEventListener('submit',function(){
+
+            const isPasswordStrong = updatePasswordStrength();
+            const isPasswordMatch = checkPasswordMatch();
+
+            if (!isPasswordStrong || !isPasswordMatch) {
+                event.preventDefault();
+                alert('Please check your password');
+                return;
+            }
+        });
+    })
+
+</script>
+
+{% endblock%}

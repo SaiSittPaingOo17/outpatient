@@ -1,0 +1,16 @@
+{% extends 'patient/layout.html' %}
+{% block body %}
+    <h1>This is login page</h1>
+    <form method="POST" action="{% url 'patient:patient_login' %}">
+    <div class="mb-3">
+        <label for="emailInput" class="form-label">Email address</label>
+        <input type="email" class="form-control" id="emailInput" name="email">
+    </div>
+    <div class="mb-3">
+        <label for="passwordInput" class="form-label">Password</label>
+        <input type="password" class="form-control" id="passwordInput" name="password">
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{% endblock%}

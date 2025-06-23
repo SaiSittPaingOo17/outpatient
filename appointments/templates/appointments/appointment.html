@@ -1,0 +1,12 @@
+{% extends "appointments/layout.html" %}
+{% block body %}
+    <h1>Appointment {{appointment.id}} </h1>
+    <ul>
+        <li>Time: {{ appointment.apt_time }}</li>
+        <li>Doctor: {{appointment.doctor}} </li>
+        <li>Patient: {{appointment.patient}} </li>
+    </ul>
+
+    
+    <a href="{% url 'index' %}">Back to Appointment List</a>
+{% endblock %}
