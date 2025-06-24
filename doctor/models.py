@@ -1,4 +1,5 @@
 from django.db import models
+from accounts.models import User 
 
 class Department(models.Model):
     STATUS_CHOICE = [
@@ -29,6 +30,7 @@ class Doctor(models.Model):
         ('inactive', 'Inactive')
     ]
 
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="doctors")
     fname = models.CharField(max_length=64)
     lname = models.CharField(max_length=64)
@@ -37,6 +39,7 @@ class Doctor(models.Model):
     email = models.EmailField(max_length=64, unique=True)
     phone = models.CharField(max_length=20)
     address = models.TextField(max_length=500)
+    password = models.CharField(max_length=128, default='@User123')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True) 

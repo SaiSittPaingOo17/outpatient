@@ -30,7 +30,7 @@ class Patient(models.Model):
     phone = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(max_length=64)
     address = models.TextField(blank=True, null=True)
-    password = models.CharField(max_length=20)
+    password = models.CharField(max_length=128)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

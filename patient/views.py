@@ -3,24 +3,28 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from django.contrib import messages
+from django.contrib.auth.hashers import make_password, check_password
 
 from .models import Patient
 from .forms import PatientForm
 
+# Patient Homepage
 def index(request):
     return render(request, 'patient/index.html')
 
+# Login
 def patient_register(request):
     if request.method == 'POST':
         # print('Post Data', request.POST)
-        form = PatientForm(request.POST or None)
+        form = PatientForm(request.POST)
         if form.is_valid():
             # print('Form Validataion: ',form.is_valid)
             # if not form.is_valid():
                 # print('Form Error: ',form.errors)
+            form.instance.password = make_password(form.cleaned_data['password'])
             form.save()
             messages.success(request, "Registration is successfully completed.")
-            return HttpResponseRedirect(reverse('index'))
+            return HttpResponseRedirect(reverse('patient:index'))
         else:
             fname = request.POST['fname']
             lname = request.POST['lname']
@@ -44,23 +48,38 @@ def patient_register(request):
 
 def patient_login(request):
     if request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
+        email = request.POST.get('email','')
+        password = request.POST.get('password','')
 
-        check_user = Patient.object.get(email)
-        if check_user:
-            check_password = Patient.object.get()
-            if check_password == password:
-                messages.success("Login Success")
+        # print(email)
+        # print(password)
+
+        try:
+            patient = Patient.objects.get(email=email)
+
+            if check_password(password, patient.password):
+                request.session['patient_id'] = patient.id
+                request.session['patient_email'] = patient.email
+
+                # print(request.session['patient_id'])
+                # print(request.session['patient_email'])
+                messages.success(request, ('Login Succeeds!'))
                 return HttpResponseRedirect(reverse('patient:index'))
             else:
-                message = messages.danger("Wrong email or password! Please try again")
-                return render(request, 'patient/patient_login.html',{
-                    'message': message
-                })
-
-
-     
-
+                messages.error(request, "Wrong email or password! Please try again.")
+                return render(request, 'patient/patient_login.html')
+        
+        except Patient.DoesNotExist:
+            messages.error(request, 'Wrong Email or Password!')
+            return render(request, 'patient/patient_login.html')
+        except Exception as e:
+            messages.error(request, "An error occurred. Please try again.")
+            return render(request, 'patient/patient_login.html')
+    else:
+        return render(request, 'patient/patient_login.html')
+             
+# Logout
 def patient_logout(request):
-    return render(request, 'patient/patient_logout')
+    request.session.flush()  # Clears all session data
+    messages.success(request, "You have been logged out.")
+    return HttpResponseRedirect(reverse('patient:patient_login'))

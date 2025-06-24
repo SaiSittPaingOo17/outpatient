@@ -103,7 +103,10 @@
                     <input type="checkbox" class="form-check-input" id="checkAgree">
                     <label class="form-check-label" for="exampleCheck1">Agree Terms and Conditions</label>
                 </div>
-                <button type="submit" class="btn btn-primary" id="btnSubmit" disabled>Submit</button>
+                <div class="mb-3 text-center">
+                    <button type="submit" class="btn btn-primary" id="btnSubmit" disabled>Submit</button>
+                </div>
+                <a href="{% url 'patient:patient_login' %}">Already have an account? Login Here</a>
             </form>
         </div>
     </div>
