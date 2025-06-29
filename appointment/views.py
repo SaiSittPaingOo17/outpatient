@@ -1,0 +1,123 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.utils import timezone
+from datetime import timedelta
+
+from .models import DoctorAvailability, Appointment
+from doctor.models import Doctor, Department
+from patient.models import Patient
+from .forms import AppointmentForm
+
+
+def index(request):
+    return render(request,'appointment/index.html')
+# -----------------------------
+# Doctor Views
+# -----------------------------
+def doctor_availability_view(request):
+    doctor = request.user.doctor
+    availability = DoctorAvailability.objects.filter(doctor=doctor)
+    return render(request, 'appointment/doctor_availability.html', {
+        'availability': availability
+    })
+
+def add_availability(request):
+    doctor = request.user.doctor
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        DoctorAvailability.objects.create(doctor=doctor, available_date=date, available_time=time)
+        messages.success(request, 'Availability added.')
+        return redirect('doctor_availability')
+    return render(request, 'appointment/add_availability.html')
+
+def doctor_appointments(request):
+    doctor = request.user.doctor
+    appointments = Appointment.objects.filter(doctor=doctor).order_by('-created_at')
+    return render(request, 'appointment/doctor_appointments.html', {
+        'appointments': appointments
+    })
+
+def confirm_appointment(request, appointment_id):
+    appointment = get_object_or_404(Appointment, id=appointment_id, doctor=request.user.doctor)
+    if appointment.status == 'pending':
+        appointment.status = 'confirmed'
+        appointment.save()
+        messages.success(request, 'Appointment confirmed.')
+    return redirect('doctor_appointments')
+
+
+# -----------------------------
+# Patient Views
+# -----------------------------
+def search_doctors(request):
+    query = request.GET.get('q')  # Name search
+    department = request.GET.get('department')  # Department search
+    
+    # Start with all active doctors
+    doctors = Doctor.objects.filter(status='active').select_related('department')
+    
+    # Filter by name if query is provided
+    if query:
+        doctors = doctors.filter(fname__icontains=query)
+    
+    # Filter by department name if department is provided
+    if department:
+        doctors = doctors.filter(department__dep_name__icontains=department)
+    
+    # Get all active departments for the dropdown
+    all_departments = Department.objects.filter(status='active').values_list('dep_name', flat=True).distinct().order_by('dep_name')
+    
+    return render(request, 'appointment/search_doctors.html', {
+        'doctors': doctors,
+        'all_departments': all_departments,
+        'selected_department': department,
+        'search_query': query
+    })
+
+def view_availability(request, doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+    available_slots = DoctorAvailability.objects.filter(doctor=doctor)
+    return render(request, 'appointment/view_availability.html', {
+        'doctor': doctor,
+        'available_slots': available_slots
+    })
+
+def book_appointment(request, availability_id):
+    availability = get_object_or_404(DoctorAvailability, id=availability_id)
+    patient = request.user.patient  # Assuming User is linked to Patient
+
+    if timezone.now() + timedelta(days=2) > timezone.make_aware(datetime.combine(availability.available_date, availability.available_time)):
+        messages.error(request, 'You must book at least 2 days in advance.')
+        return redirect('view_availability', doctor_id=availability.doctor.id)
+
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            appointment = form.save(commit=False)
+            appointment.patient = patient
+            appointment.doctor = availability.doctor
+            appointment.appointed_datetime = timezone.make_aware(datetime.combine(availability.available_date, availability.available_time))
+            appointment.status = 'pending'
+            appointment.save()
+            messages.success(request, 'Appointment request sent.')
+            return redirect('search_doctors')
+    else:
+        form = AppointmentForm()
+
+    return render(request, 'appointment/book_appointment.html', {
+        'form': form,
+        'availability': availability
+    })
+
+def view_appointments(request):
+    patient_id = request.session.get('patient_id')
+    if not patient_id:
+        messages.error(request, "You must be logged in to view your appointments.")
+        return redirect('patient:patient_login')
+
+    appointments = Appointment.objects.filter(patient_id=patient_id).order_by('-appointed_datetime')
+
+    return render(request, 'appointment/view_appointments.html', {
+        'appointments': appointments
+    })

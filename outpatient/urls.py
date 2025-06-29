@@ -16,10 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("Welcome to the Hospital Outpatient System")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/',include('accounts.urls')),
     path('patient/', include('patient.urls')),
-    path('doctor/', include('doctor.urls')),  
+    path('doctor/', include('doctor.urls')),
+    path('appointment/', include('appointment.urls')),  
 ]

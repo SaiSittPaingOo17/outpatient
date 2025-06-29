@@ -8,7 +8,7 @@ class Department(models.Model):
     ]
 
     dep_name = models.CharField(max_length=100, unique=True)
-    dep_email = models.EmailField()
+    dep_email = models.EmailField(max_length=100)
     dep_phone = models.CharField(max_length=20)
     dep_location = models.TextField(max_length=500)
     description = models.TextField(max_length=500, blank=True)

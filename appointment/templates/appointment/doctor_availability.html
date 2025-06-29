@@ -1,0 +1,14 @@
+{% extends 'appointment/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>My Availability</h2>
+    <a href="{% url 'appointment:add_availability' %}" class="btn btn-sm btn-success mb-3">Add Availability</a>
+    <ul class="list-group">
+        {% for slot in availability %}
+            <li class="list-group-item">{{ slot.available_date }} at {{ slot.available_time }}</li>
+        {% empty %}
+            <li class="list-group-item">No availability added.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

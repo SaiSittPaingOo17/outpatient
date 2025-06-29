@@ -1,0 +1,96 @@
+{% extends 'appointment/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Search Doctors</h2>
+    
+    <!-- Search and Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-5">
+                    <label for="q" class="form-label">Search by Name:</label>
+                    <input type="text" 
+                           id="q"
+                           name="q" 
+                           placeholder="Enter doctor name..." 
+                           class="form-control" 
+                           value="{{ search_query|default:'' }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="department" class="form-label">Filter by Department:</label>
+                    <select id="department" name="department" class="form-select">
+                        <option value="">All Departments</option>
+                        {% for dept in all_departments %}
+                            <option value="{{ dept }}" 
+                                    {% if dept == selected_department %}selected{% endif %}>
+                                {{ dept }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Search</button>
+                    <a href="{% url 'appointment:search_doctors' %}" class="btn btn-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    {% if doctors %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Available Doctors</h4>
+            <span class="badge bg-info">{{ doctors.count }} doctor{{ doctors.count|pluralize }} found</span>
+        </div>
+        
+        <div class="row">
+            {% for doctor in doctors %}
+                <div class="col-lg-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-1">Dr. {{ doctor.fname }} {{ doctor.lname|default:'' }}</h5>
+                                <span class="badge bg-primary">{{ doctor.department.dep_name }}</span>
+                            </div>
+                            <p class="card-text mb-2">
+                                <strong>Specialization:</strong> {{ doctor.specialisation|default:'General Practice' }}<br>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ doctor.department.dep_name }} Department</small>
+                                <a href="{% url 'appointment:view_availability' doctor.id %}" 
+                                   class="btn btn-outline-info btn-sm">
+                                    View Availability
+                                </a>
+                            </div>
+                            {% if doctor.department.dep_location %}
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt"></i> {{ doctor.department.dep_location }}
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            <h4 class="alert-heading">
+                {% if search_query or selected_department %}
+                    No doctors found matching your criteria
+                {% else %}
+                    No doctors available
+                {% endif %}
+            </h4>
+            <p class="mb-0">
+                {% if search_query or selected_department %}
+                    Try adjusting your search terms or <a href="{% url 'appointment:search_doctors' %}" class="alert-link">clearing the filters</a>.
+                {% else %}
+                    Please check back later or contact support.
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

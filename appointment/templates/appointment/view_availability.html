@@ -1,0 +1,16 @@
+{% extends 'appointment/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Available Slots - Dr. {{ doctor.fname }} {{ doctor.lname }}</h2>
+    <ul class="list-group">
+        {% for slot in available_slots %}
+            <li class="list-group-item d-flex justify-content-between">
+                {{ slot.available_date }} at {{ slot.available_time }}
+                <a href="{% url 'appointment:book_appointment' slot.id %}" class="btn btn-sm btn-success">Book</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item">No available slots.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

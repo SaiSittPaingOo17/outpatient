@@ -1,5 +1,10 @@
 {% extends 'patient/layout.html' %}
 {% block body %}
+    <nav>
+        <ul>
+          <li><a href="{% url 'patient:patient_logout' %}">Logout</a></li>
+        </ul>
+    </nav>
     <h1>This is Home Page</h1>
     <a href="{% url 'patient:patient_register' %}">Registration</a>
 {% endblock %}
