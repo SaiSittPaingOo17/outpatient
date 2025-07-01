@@ -12,7 +12,7 @@ urlpatterns = [
     path('view_appointments/', views.view_appointments, name='view_appointments'),
 
     # Doctor-side
-    path('doctor/availability/', views.doctor_availability_view, name='doctor_availability'),
+    path('doctor/availability/', views.doctor_availability_view, name='availability'),
     path('doctor/availability/add/', views.add_availability, name='add_availability'),
     path('doctor/appointments/', views.doctor_appointments, name='doctor_appointments'),
     path('doctor/appointments/confirm/<int:appointment_id>/', views.confirm_appointment, name='confirm_appointment'),

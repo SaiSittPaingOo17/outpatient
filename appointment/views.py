@@ -1,12 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.contrib import messages
+
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from .models import DoctorAvailability, Appointment
 from doctor.models import Doctor, Department
 from patient.models import Patient
 from .forms import AppointmentForm
+from .decorators import doctor_login_required
 
 
 def index(request):
@@ -14,37 +18,46 @@ def index(request):
 # -----------------------------
 # Doctor Views
 # -----------------------------
+@doctor_login_required
 def doctor_availability_view(request):
-    doctor = request.user.doctor
+    doctor = request.doctor
     availability = DoctorAvailability.objects.filter(doctor=doctor)
     return render(request, 'appointment/doctor_availability.html', {
-        'availability': availability
+        'availability': availability,
+        'doctor': doctor
     })
 
+@doctor_login_required
 def add_availability(request):
-    doctor = request.user.doctor
+    doctor = request.doctor
     if request.method == 'POST':
         date = request.POST.get('date')
         time = request.POST.get('time')
         DoctorAvailability.objects.create(doctor=doctor, available_date=date, available_time=time)
         messages.success(request, 'Availability added.')
-        return redirect('doctor_availability')
-    return render(request, 'appointment/add_availability.html')
-
-def doctor_appointments(request):
-    doctor = request.user.doctor
-    appointments = Appointment.objects.filter(doctor=doctor).order_by('-created_at')
-    return render(request, 'appointment/doctor_appointments.html', {
-        'appointments': appointments
+        return redirect('doctor:availability')
+    return render(request, 'appointment/add_availability.html',{
+        'doctor':doctor,
     })
 
+@doctor_login_required
+def doctor_appointments(request):
+    doctor = request.doctor
+    appointments = Appointment.objects.filter(doctor=doctor).order_by('-created_at')
+    return render(request, 'appointment/doctor_appointments.html', {
+        'appointments': appointments,
+        'doctor': doctor,
+    })
+
+@doctor_login_required
 def confirm_appointment(request, appointment_id):
-    appointment = get_object_or_404(Appointment, id=appointment_id, doctor=request.user.doctor)
+    doctor = request.doctor
+    appointment = get_object_or_404(Appointment, id=appointment_id, doctor=doctor)
     if appointment.status == 'pending':
         appointment.status = 'confirmed'
         appointment.save()
         messages.success(request, 'Appointment confirmed.')
-    return redirect('doctor_appointments')
+    return redirect('appointment:doctor_appointments')
 
 
 # -----------------------------
