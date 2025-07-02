@@ -9,7 +9,7 @@
     <a href="{% url 'appointment:add_availability' %}" class="btn btn-sm btn-success mb-3">Add Availability</a>
     <ul class="list-group">
         {% for slot in availability %}
-            <li class="list-group-item">{{ slot.available_date }} at {{ slot.available_time }}</li>
+            <li class="list-group-item">{{ slot.available_date }} from {{ slot.start_time }} to {{slot.end_time}}</li>
         {% empty %}
             <li class="list-group-item">No availability added.</li>
         {% endfor %}

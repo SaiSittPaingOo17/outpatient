@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 
 from django.utils import timezone
 from datetime import timedelta, datetime
@@ -32,12 +33,30 @@ def add_availability(request):
     doctor = request.doctor
     if request.method == 'POST':
         date = request.POST.get('date')
-        time = request.POST.get('time')
-        DoctorAvailability.objects.create(doctor=doctor, available_date=date, available_time=time)
-        messages.success(request, 'Availability added.')
-        return redirect('doctor:availability')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+
+        try:
+            availability = DoctorAvailability(
+                doctor=doctor,
+                available_date=date,
+                start_time=start_time,
+                end_time=end_time
+            )
+            # Clean method to validate times
+            availability.full_clean()
+            availability.save()
+            
+            messages.success(request, f'Availability added for {date} from {start_time} to {end_time}.')
+            return redirect('appointment:availability')
+            
+        except ValidationError as e:
+            messages.error(request, f'Error: {e.message_dict.get("__all__", ["Invalid time range"])[0]}')
+        except Exception as e:
+            messages.error(request, f'Error adding availability: {str(e)}')
     return render(request, 'appointment/add_availability.html',{
         'doctor':doctor,
+        
     })
 
 @doctor_login_required
@@ -100,6 +119,9 @@ def book_appointment(request, availability_id):
     availability = get_object_or_404(DoctorAvailability, id=availability_id)
     patient = request.user.patient  # Assuming User is linked to Patient
 
+    # appointment_datetime = timezone.make_aware(
+    #     datetime.combine(availability.available_date, availability.available_time)
+    # )
     if timezone.now() + timedelta(days=2) > timezone.make_aware(datetime.combine(availability.available_date, availability.available_time)):
         messages.error(request, 'You must book at least 2 days in advance.')
         return redirect('view_availability', doctor_id=availability.doctor.id)

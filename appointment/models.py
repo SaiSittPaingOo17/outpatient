@@ -3,17 +3,25 @@ from django.utils import timezone
 from datetime import timedelta
 from doctor.models import Doctor
 from patient.models import Patient
+from django.core.exceptions import ValidationError
+
 
 class DoctorAvailability(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     available_date = models.DateField()
-    available_time = models.TimeField()
+    start_time = models.TimeField(default='09:00:00')
+    end_time = models.TimeField(default='21:00:00')
 
     class Meta:
-        unique_together = ('doctor', 'available_date', 'available_time')
+        unique_together = ('doctor', 'available_date', 'start_time', 'end_time')
 
     def __str__(self):
-        return f"{self.doctor} on {self.available_date} at {self.available_time}"
+        return f"{self.doctor} on {self.available_date} ({self.start_time} - {self.end_time})"
+
+    def clean(self):
+        
+        if self.start_time >= self.end_time:
+            raise ValidationError("End time must be after start time.")
 
 
 class Appointment(models.Model):
