@@ -11,7 +11,7 @@ from .models import DoctorAvailability, Appointment
 from doctor.models import Doctor, Department
 from patient.models import Patient
 from .forms import AppointmentForm
-from .decorators import doctor_login_required
+from .decorators import doctor_login_required, patient_login_required
 
 
 def index(request):
@@ -82,22 +82,23 @@ def confirm_appointment(request, appointment_id):
 # -----------------------------
 # Patient Views
 # -----------------------------
+@patient_login_required
 def search_doctors(request):
     query = request.GET.get('q')  # Name search
     department = request.GET.get('department')  # Department search
     
-    # Start with all active doctors
+    # All active doctors
     doctors = Doctor.objects.filter(status='active').select_related('department')
     
-    # Filter by name if query is provided
+    # Filter by name
     if query:
         doctors = doctors.filter(fname__icontains=query)
     
-    # Filter by department name if department is provided
+    # Filter by department nam
     if department:
         doctors = doctors.filter(department__dep_name__icontains=department)
     
-    # Get all active departments for the dropdown
+    # Get all active departments
     all_departments = Department.objects.filter(status='active').values_list('dep_name', flat=True).distinct().order_by('dep_name')
     
     return render(request, 'appointment/search_doctors.html', {
@@ -107,22 +108,45 @@ def search_doctors(request):
         'search_query': query
     })
 
-def view_availability(request, doctor_id):
-    doctor = get_object_or_404(Doctor, id=doctor_id)
-    available_slots = DoctorAvailability.objects.filter(doctor=doctor)
-    return render(request, 'appointment/view_availability.html', {
-        'doctor': doctor,
-        'available_slots': available_slots
+# @patient_login_required
+# def view_availability(request, doctor_id):
+#     doctor = get_object_or_404(Doctor, id=doctor_id)
+#     available_slots = DoctorAvailability.objects.filter(doctor=doctor)
+#     return render(request, 'appointment/view_availability.html', {
+#         'doctor': doctor,
+#         'available_slots': available_slots
+#     })
+
+@patient_login_required
+def patient_view_availability(request, doctor_id):
+    doctor_info = get_object_or_404(Doctor, id=doctor_id, status='active')
+    
+    # Get available slots for this doctor
+    available_slots = DoctorAvailability.objects.filter(
+        doctor=doctor_info,
+        available_date__gte=timezone.now().date()
+    ).order_by('available_date', 'start_time')
+    
+    # Get patient info from session
+    patient_id = request.session.get('patient_id')
+    patient = get_object_or_404(Patient, id=patient_id)
+    
+    return render(request, 'appointment/patient_view_availability.html', {
+        'doctor_info': doctor_info,
+        'available_slots': available_slots,
+        'patient': patient  # Only pass patient context
     })
 
+@patient_login_required
 def book_appointment(request, availability_id):
     availability = get_object_or_404(DoctorAvailability, id=availability_id)
-    patient = request.user.patient  # Assuming User is linked to Patient
+    patient_id = request.session.get('patient_id')
+    patient = get_object_or_404(Patient, id=patient_id)
 
     # appointment_datetime = timezone.make_aware(
-    #     datetime.combine(availability.available_date, availability.available_time)
+    #     datetime.combine(availability.available_date, availability.start_time, availability.end_time)
     # )
-    if timezone.now() + timedelta(days=2) > timezone.make_aware(datetime.combine(availability.available_date, availability.available_time)):
+    if timezone.now() + timedelta(days=2) > timezone.make_aware(datetime.combine(availability.available_date, availability.start_time)):
         messages.error(request, 'You must book at least 2 days in advance.')
         return redirect('view_availability', doctor_id=availability.doctor.id)
 
@@ -132,11 +156,11 @@ def book_appointment(request, availability_id):
             appointment = form.save(commit=False)
             appointment.patient = patient
             appointment.doctor = availability.doctor
-            appointment.appointed_datetime = timezone.make_aware(datetime.combine(availability.available_date, availability.available_time))
+            appointment.appointed_datetime = timezone.make_aware(datetime.combine(availability.available_date, availability.start_time))
             appointment.status = 'pending'
             appointment.save()
             messages.success(request, 'Appointment request sent.')
-            return redirect('search_doctors')
+            return HttpResponseRedirect(reverse('appointment:search_doctors'))
     else:
         form = AppointmentForm()
 
@@ -145,6 +169,7 @@ def book_appointment(request, availability_id):
         'availability': availability
     })
 
+@patient_login_required
 def view_appointments(request):
     patient_id = request.session.get('patient_id')
     if not patient_id:

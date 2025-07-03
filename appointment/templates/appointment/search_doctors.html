@@ -57,7 +57,7 @@
                             </p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <small class="text-muted">{{ doctor.department.dep_name }} Department</small>
-                                <a href="{% url 'appointment:view_availability' doctor.id %}" 
+                                <a href="{% url 'appointment:patient_view_availability' doctor.id %}" 
                                    class="btn btn-outline-info btn-sm">
                                     View Availability
                                 </a>

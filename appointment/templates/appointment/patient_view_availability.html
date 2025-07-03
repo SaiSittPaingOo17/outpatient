@@ -1,0 +1,38 @@
+{% extends 'appointment/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Doctor Availability</h2>
+    <p>Book your appointment with Dr. {{ doctor_info.fname }} {{ doctor_info.lname }}</p>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Patient:</h4>
+            <p>{{ patient.fname }} {{ patient.lname }} ({{ patient.email }})</p>
+        </div>
+        <div class="col-md-6">
+            <h4>Dr. {{ doctor_info.fname }} {{ doctor_info.lname }}</h4>
+            <p><strong>Department:</strong> {{ doctor_info.department.dep_name }}</p>
+            <p><strong>Specialization:</strong> {{ doctor_info.specialization }}</p>
+            <p><strong>Phone:</strong> {{ doctor_info.phone }}</p>
+        </div>
+    </div>
+    
+    <h4>Available Time Slots</h4>
+    <div class="row">
+        {% for slot in available_slots %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ slot.available_date }}</h5>
+                        <p class="card-text">{{ slot.start_time }} - {{ slot.end_time }}</p>
+                        <a href="{% url 'appointment:book_appointment' slot.id %}" class="btn btn-primary">Book Appointment</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No available slots for this doctor.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

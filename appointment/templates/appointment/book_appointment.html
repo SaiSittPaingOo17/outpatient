@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Book Appointment with Dr. {{ availability.doctor.fname }} {{ availability.doctor.lname }}</h2>
-    <p>Date: {{ availability.available_date }} | Time: {{ availability.available_time }}</p>
+    <p>Date: {{ availability.available_date }} | Time: {{ availability.start_time }}-{{ availability.end_time}}</p>
 
     <form method="POST">
         {% csrf_token %}

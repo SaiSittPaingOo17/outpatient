@@ -8,11 +8,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from .models import Patient
 from .forms import PatientForm
 
-# Patient Homepage
-def index(request):
-    return render(request, 'patient/index.html')
-
-# Login
+# Register
 def patient_register(request):
     if request.method == 'POST':
         # print('Post Data', request.POST)
@@ -46,6 +42,7 @@ def patient_register(request):
     else:
         return render(request, 'patient/patient_register.html') 
 
+# Login
 def patient_login(request):
     if request.method == 'POST':
         email = request.POST.get('email','')
@@ -64,7 +61,7 @@ def patient_login(request):
                 # print(request.session['patient_id'])
                 # print(request.session['patient_email'])
                 messages.success(request, ('Login Succeeds!'))
-                return HttpResponseRedirect(reverse('patient:index'))
+                return HttpResponseRedirect(reverse('appointment:search_doctors'))
             else:
                 messages.error(request, "Wrong email or password! Please try again.")
                 return render(request, 'patient/patient_login.html')
