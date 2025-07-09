@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime, date
 from doctor.models import Doctor
 from patient.models import Patient
 from django.core.exceptions import ValidationError
@@ -18,17 +18,27 @@ class DoctorAvailability(models.Model):
     def __str__(self):
         return f"{self.doctor} on {self.available_date} ({self.start_time} - {self.end_time})"
 
+    
     def clean(self):
-        
-        if self.start_time >= self.end_time:
-            raise ValidationError("End time must be after start time.")
+        if self.start_time and self.end_time:
+            start_datetime = datetime.combine(date.today(), self.start_time)
+            end_datetime = datetime.combine(date.today(), self.end_time)
+            duration = end_datetime - start_datetime
+            
+            # Check if duration is at least 3 hours
+            if duration < timedelta(hours=3):
+                raise ValidationError("Each availability schedule must be at least 3 hours long.")
+            
+            if self.start_time >= self.end_time:
+                raise ValidationError("Start time must be before end time.")
 
 
 class Appointment(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('confirmed', 'Confirmed'),
-        ('cancelled', 'Cancelled')
+        ('cancelled', 'Cancelled'),
+        ('completed', 'Completed'),
     ]
 
     REASON_CHOICES = [

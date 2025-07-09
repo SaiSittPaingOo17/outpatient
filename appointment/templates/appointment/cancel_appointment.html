@@ -1,0 +1,49 @@
+{% extends 'appointment/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Cancel Appointment</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <strong>Warning:</strong> You are about to cancel the following appointment:
+                    </div>
+                    
+                    <div class="appointment-details mb-4">
+                        <h5>Appointment Details:</h5>
+                        <ul class="list-unstyled">
+                            <li><strong>Doctor:</strong> Dr. {{ appointment.doctor.fname }} {{ appointment.doctor.lname }}</li>
+                            <li><strong>Department:</strong> {{ appointment.doctor.department.dep_name }}</li>
+                            <li><strong>Date & Time:</strong> {{ appointment.appointed_datetime|date:"D, d M Y H:i" }}</li>
+                            <li><strong>Status:</strong> {{ appointment.status|title }}</li>
+                            <li><strong>Reason:</strong> {{ appointment.get_visit_reason_display }}</li>
+                        </ul>
+                    </div>
+
+                    <form method="post" action="{% url 'appointment:cancel_appointment' appointment.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason for cancellation (optional):</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3" 
+                                      placeholder="Please provide a reason for cancellation..."></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'appointment:view_appointments' %}" class="btn btn-secondary me-md-2">
+                                Keep Appointment
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                Confirm Cancellation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

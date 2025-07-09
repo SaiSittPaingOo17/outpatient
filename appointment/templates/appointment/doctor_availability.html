@@ -1,18 +1,120 @@
 {% extends 'appointment/base.html' %}
 {% block content %}
 <div class="container mt-5">
-    <div class="mb-2">
-            <h2>My Availability</h2>
-    <strong>Dr. {{doctor.fname}} {{doctor.lname}}</strong>
-    </div>
+    <div class="row">
+        <div class="col-md-8 col-lg-12 mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">My Availability</h2>
+                    <p class="text-muted mb-0">Dr. {{doctor.fname}} {{doctor.lname}}</p>
+                </div>
+                <a href="{% url 'appointment:add_availability' %}" class="btn btn-success">
+                    <i class="fas fa-plus me-2"></i>Add Availability
+                </a>
+            </div>
 
-    <a href="{% url 'appointment:add_availability' %}" class="btn btn-sm btn-success mb-3">Add Availability</a>
-    <ul class="list-group">
-        {% for slot in availability %}
-            <li class="list-group-item">{{ slot.available_date }} from {{ slot.start_time }} to {{slot.end_time}}</li>
-        {% empty %}
-            <li class="list-group-item">No availability added.</li>
-        {% endfor %}
-    </ul>
+            {% if availability %}
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Available Time Slots</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Duration</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for slot in availability %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ slot.available_date|date:"M d, Y" }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ slot.available_date|date:"l" }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary me-1">{{ slot.start_time|time:"g:i A" }}</span>
+                                            <span class="text-muted">to</span>
+                                            <span class="badge bg-secondary ms-1">{{ slot.end_time|time:"g:i A" }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">Available</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" 
+                                                    data-url="{% url 'appointment:delete_availability' slot.id %}"
+                                                    data-slot-info="{{ slot.available_date|date:'M d, Y' }} at {{ slot.start_time|time:'g:i A' }}">
+                                                <i class="fas fa-trash me-1"></i>Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card text-center">
+                    <div class="card-body py-5">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No availability scheduled</h5>
+                        <p class="text-muted mb-3">You haven't added any availability slots yet.</p>
+                        <a href="{% url 'appointment:add_availability' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add Your First Availability
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirm Delete
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1">Are you sure you want to delete this availability slot?</p>
+                <p class="text-muted mb-0" id="slotDetails"></p>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteBtn" class="btn btn-danger">
+                    <i class="fas fa-trash me-2"></i>Delete
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle delete button clicks
+    document.querySelectorAll('.delete-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const deleteUrl = this.getAttribute('data-url');
+            const slotInfo = this.getAttribute('data-slot-info');
+            
+            document.getElementById('confirmDeleteBtn').href = deleteUrl;
+            document.getElementById('slotDetails').textContent = slotInfo;
+            
+            var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -1,25 +1,51 @@
 {% extends 'appointment/base.html' %}
+
 {% block content %}
 <div class="container mt-5">
     <h2>My Appointments</h2>
 
-    {% if appointments %}
-        <ul class="list-group mt-3">
+    <div class="row col-lg-12 col-md-8">
+        {% if appointments %}
+        <ul class="list-group">
             {% for appt in appointments %}
-                <li class="list-group-item">
-                    <strong>Doctor:</strong> Dr. {{ appt.doctor.fname }} {{ appt.doctor.lname }} <br>
-                    <strong>Date & Time:</strong> {{ appt.appointed_datetime|date:"D, d M Y H:i" }} <br>
-                    <strong>Status:</strong> {{ appt.status|title }} <br>
-                    <strong>Reason:</strong> {{ appt.get_visit_reason_display }} <br>
-                    {% if appt.status == "cancelled" %}
-                        <strong>Cancelled by:</strong> {{ appt.cancelled_by }} <br>
-                        <strong>Reason:</strong> {{ appt.cancellation_reason }}
-                    {% endif %}
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="list-text">
+                        <strong>Doctor:</strong> Dr. {{ appt.doctor.fname }} {{ appt.doctor.lname }} <br>
+                        <strong>Department:</strong> {{ appt.doctor.department.dep_name }} <br>
+                        <strong>Date & Time:</strong> {{ appt.appointed_datetime|date:"D, d M Y H:i" }} <br>
+                        <strong>Status:</strong> 
+                        <span class="badge 
+                            {% if appt.status == 'pending' %}bg-warning text-dark
+                            {% elif appt.status == 'confirmed' %}bg-success
+                            {% elif appt.status == 'cancelled' %}bg-danger
+                            {% endif %}">
+                            {{ appt.status|title }}
+                        </span><br>
+                        <strong>Reason:</strong> {{ appt.get_visit_reason_display }} <br>
+                        {% if appt.notes %}
+                            <strong>Notes:</strong> {{ appt.notes }} <br>
+                        {% endif %}
+                        {% if appt.status == "cancelled" %}
+                            <strong>Cancelled by:</strong> {{ appt.cancelled_by|title }} <br>
+                            {% if appt.cancellation_reason %}
+                                <strong>Cancellation Reason:</strong> {{ appt.cancellation_reason }} <br>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="list-button">
+                        {% if appt.status in 'pending,confirmed' and appt.is_cancellable %}
+                            <a href="{% url 'appointment:cancel_appointment' appt.id %}" 
+                               class="btn btn-outline-danger btn-sm">Cancel Appointment</a>
+                        {% elif appt.status in 'pending,confirmed' and not appt.is_cancellable %}
+                            <small class="text-muted">Cannot cancel<br>(less than 2 days)</small>
+                        {% endif %}
+                    </div>
                 </li>
             {% endfor %}
         </ul>
-    {% else %}
+        {% else %}
         <div class="alert alert-info mt-3">You have no appointments.</div>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
