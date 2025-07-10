@@ -24,9 +24,11 @@ def index(request):
 def doctor_availability_view(request):
     doctor = request.doctor
     availability = DoctorAvailability.objects.filter(doctor=doctor)
+
     return render(request, 'appointment/doctor_availability.html', {
         'availability': availability,
-        'doctor': doctor
+        'doctor': doctor,
+        
     })
 
 @doctor_login_required

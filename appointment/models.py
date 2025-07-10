@@ -18,7 +18,28 @@ class DoctorAvailability(models.Model):
     def __str__(self):
         return f"{self.doctor} on {self.available_date} ({self.start_time} - {self.end_time})"
 
-    
+    @property
+    def duration(self):
+        """Calculate and return the duration of the availability slot"""
+        if self.start_time and self.end_time:
+            start_datetime = datetime.combine(date.today(), self.start_time)
+            end_datetime = datetime.combine(date.today(), self.end_time)
+            duration = end_datetime - start_datetime
+            
+            # Convert to hours and minutes for display
+            hours = duration.seconds // 3600
+            minutes = (duration.seconds % 3600) // 60
+            
+            if hours > 0 and minutes > 0:
+                return f"{hours}h {minutes}m"
+            elif hours > 0:
+                return f"{hours}h"
+            elif minutes > 0:
+                return f"{minutes}m"
+            else:
+                return "0m"
+        return "N/A"
+
     def clean(self):
         if self.start_time and self.end_time:
             start_datetime = datetime.combine(date.today(), self.start_time)
