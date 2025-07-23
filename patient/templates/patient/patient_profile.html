@@ -1,0 +1,27 @@
+
+{% extends 'patient/layout.html' %}
+{% block body %}
+<div class="row justify-content-center align-items-center">
+<div class="profile-info border m-3 p-3">
+    <h3>Profile Settings</h3>
+        <ul>
+            <li>Name: <strong>{{fname}} {{lname}}</strong>  </li>
+            <li>Email: <strong>{{email}}</strong></li>
+            <li>DOB: {{date_of_birth}}</li>
+            <li>Gender: {{gender}}</li>
+            <li>Marital Status: {{marital_status}}</li>
+            <li>Phone: {{phone}}</li>
+            <li class="mb-2">Address: {{address}}</li>
+            <li><small>Registeration Date: {{created_at}} </small></li>
+            <li><small>Updated Date: {{updated_at}}</small></li>
+        </ul>
+    <div class="setting_buttons"></div>
+        <a href="{% url 'patient:edit_profile' %}"class="btn btn-warning me-2">Edit Profile</a>
+        <a href="{% url 'appointment:search_doctors' %}" class="btn btn-dark">Return</a>
+    </div>
+</div>
+</div>
+
+    
+
+{% endblock %}

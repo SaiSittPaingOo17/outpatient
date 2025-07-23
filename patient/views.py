@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect 
 from django.urls import reverse
 
@@ -7,6 +7,9 @@ from django.contrib.auth.hashers import make_password, check_password
 
 from .models import Patient
 from .forms import PatientForm
+
+# decorators.py from appointment-app
+from appointment.decorators import patient_login_required
 
 # Register
 def patient_register(request):
@@ -80,3 +83,66 @@ def patient_logout(request):
     request.session.flush()  # Clears all session data
     messages.success(request, "You have been logged out.")
     return HttpResponseRedirect(reverse('patient:patient_login'))
+
+# display profile information
+@patient_login_required
+def patient_profile(request):
+    patient_id = request.session.get('patient_id')
+    patient = get_object_or_404(Patient, id=patient_id)
+
+    fname = patient.fname
+    lname = patient.lname
+    date_of_birth = patient.date_of_birth
+    gender = patient.gender
+    marital_status = patient.marital_status
+    phone = patient.phone
+    email = patient.email
+    address = patient.address
+    created_at = patient.created_at
+    updated_at = patient.updated_at
+
+
+    return render(request, 'patient/patient_profile.html',{
+        'fname': fname,
+        'lname': lname,
+        'date_of_birth': date_of_birth,
+        'gender': gender,
+        'marital_status': marital_status,
+        'phone': phone,
+        'email': email,
+        'address': address,
+        'created_at': created_at,
+        'updated_at': updated_at,
+    })
+
+# edit profile information
+@patient_login_required
+def edit_profile(request):
+    patient_id = request.session.get('patient_id')
+    patient = get_object_or_404(Patient, id=patient_id)
+
+    fname = patient.fname
+    lname = patient.lname
+    date_of_birth = patient.date_of_birth
+    gender = patient.gender
+    marital_status = patient.marital_status
+    phone = patient.phone
+    email = patient.email
+    address = patient.address
+    created_at = patient.created_at
+    updated_at = patient.updated_at
+
+
+    return render(request, 'patient/edit_profile.html',{
+        'fname': fname,
+        'lname': lname,
+        'date_of_birth': date_of_birth,
+        'gender': gender,
+        'marital_status': marital_status,
+        'phone': phone,
+        'email': email,
+        'address': address,
+        'created_at': created_at,
+        'updated_at': updated_at,
+    })
+    

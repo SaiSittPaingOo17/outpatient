@@ -8,5 +8,7 @@ urlpatterns = [
     path('', RedirectView.as_view(pattern_name='patient:patient_login'), name='index'),
     path('patient_register/', views.patient_register, name='patient_register'),
     path('patient_login/', views.patient_login, name="patient_login"),
-    path('patient_logout/', views.patient_logout, name="patient_logout")
+    path('patient_logout/', views.patient_logout, name="patient_logout"),
+    path('patient_profile/', views.patient_profile, name='patient_profile'),
+    path('edit_profile/', views.edit_profile, name='edit_profile')
 ]
