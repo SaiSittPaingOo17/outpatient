@@ -7,6 +7,19 @@
             <form method="POST" id="patient_register" action="{% url 'patient:patient_register' %}">
                 {% csrf_token %}
 
+                <!-- Title -->
+                <div class="mb-3">
+                    <label for="marital_status" class="form-label">Title</label>
+                    <div class="mb-3">
+                        <select name="title" id="title" class="form-control">
+                            <option value="mr">Mr</option>
+                            <option value="mrs">Mrs</option>
+                            <option value="mss">Miss</option>
+                            <option value="ms">Ms</option>
+                            <option value="dr">Dr</option>
+                        </select>
+                </div>
+
                 <!-- Fist Name -->
                 <div class="mb-3">
                     <label class="form-label" for="fnameText">First Name</label>
@@ -22,26 +35,26 @@
                 <!-- Date of Birth -->
                 <div class="mb-3">
                     <label class="form-label" for="dateofBirth">Date of Birth</label>
-                    <input type="date" name="date_of_birth" class="form-control" id="dobDate" placeholder="Date of Birth" value="{{date_of_birth}}">
+                    <input type="date" name="date_of_birth" class="form-control" id="dobDate" placeholder="Date of Birth" value="{{date_of_birth|date:'Y-m-d'}}">
                 </div>
 
                 <!-- Gender -->
                 <div class="mb-3">
                     <label class="form-label" for="gender">Gender</label>
                     <div class="form-check">
-                        <input type="radio" class="form-check-input" name="gender" id="maleRadio" value="M">
+                        <input type="radio" class="form-check-input" name="gender" id="maleRadio" value="M" {% if gender == 'M' %}checked{% endif %}>
                         <label for="maleRadio">Male</label>
                     </div>
                     <div class="form-check">
-                        <input type="radio" class="form-check-input" name="gender" id="femaleRadio" value="F">
+                        <input type="radio" class="form-check-input" name="gender" id="femaleRadio" value="F" {% if gender == 'F' %}checked{% endif %}>
                         <label for="femaleRadio">Female</label>
                     </div>
                     <div class="form-check">
-                        <input type="radio" class="form-check-input" name="gender" id="otherRadio" value="O">
+                        <input type="radio" class="form-check-input" name="gender" id="otherRadio" value="O" {% if gender == 'O' %}checked{% endif %}>
                         <label for="otherRadio">Other</label>
                     </div>
                     <div class="form-check">
-                        <input type="radio" class="form-check-input" name="gender" id="preferRadio" value="P">
+                        <input type="radio" class="form-check-input" name="gender" id="preferRadio" value="P" {% if gender == 'P' %}checked{% endif %}>
                         <label for="preferRadio">Prefer not to say</label>
                     </div>
                 </div>

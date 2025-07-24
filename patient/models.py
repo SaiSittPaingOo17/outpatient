@@ -4,6 +4,14 @@ from datetime import date
 
 
 class Patient(models.Model):
+    TITLES = [ 
+        ('mr', 'Mr'),
+        ('mrs', 'Mrs'),
+        ('mss', 'Miss'),
+        ('ms', 'Ms'),
+        ('dr', 'Dr'),
+    ]
+
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
@@ -22,6 +30,7 @@ class Patient(models.Model):
         ('inactive', 'Inactive'),
     ]
 
+    title = models.CharField(max_length=10, choices=TITLES, blank=True, null=True)
     fname = models.CharField(max_length=64)
     lname = models.CharField(max_length=64)
     date_of_birth = models.DateField(blank=True, null=True)

@@ -121,19 +121,49 @@ def edit_profile(request):
     patient_id = request.session.get('patient_id')
     patient = get_object_or_404(Patient, id=patient_id)
 
-    fname = patient.fname
-    lname = patient.lname
-    date_of_birth = patient.date_of_birth
-    gender = patient.gender
-    marital_status = patient.marital_status
-    phone = patient.phone
-    email = patient.email
-    address = patient.address
-    created_at = patient.created_at
-    updated_at = patient.updated_at
+    if request.method == 'POST':
+        title = request.POST.get('title','')
+        fname = request.POST.get('fname', '')
+        lname = request.POST.get('lname', '')
+        date_of_birth = request.POST.get('date_of_birth', '')
+        gender = request.POST.get('gender', '')
+        marital_status = request.POST.get('marital_status', '')
+        phone = request.POST.get('phone', '')
+        address = request.POST.get('address', '')
+        password = request.POST.get('password', '')
 
+        patient.title = title
+        patient.fname = fname
+        patient.lname = lname
+        patient.date_of_birth = date_of_birth
+        patient.gender = gender
+        patient.marital_status = marital_status
+        patient.phone = phone
+        patient.address = address
+
+        if password.strip():
+            patient.password = make_password(password)
+
+        patient.save()
+
+        messages.success(request, "Your profile has been updated successfully.")
+        return HttpResponseRedirect(reverse('patient:patient_profile'))
+
+    else:
+        title = patient.title
+        fname = patient.fname
+        lname = patient.lname
+        date_of_birth = patient.date_of_birth
+        gender = patient.gender
+        marital_status = patient.marital_status
+        phone = patient.phone
+        email = patient.email
+        address = patient.address
+        created_at = patient.created_at
+        updated_at = patient.updated_at
 
     return render(request, 'patient/edit_profile.html',{
+        'title': title,
         'fname': fname,
         'lname': lname,
         'date_of_birth': date_of_birth,

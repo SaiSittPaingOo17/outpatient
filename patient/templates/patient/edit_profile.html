@@ -4,8 +4,22 @@
     <div class="col-lg-10 border rounded m-3">
         <div class="patient-registrion m-3">
             <h2>Edit Profile Information</h2>
-            <form method="POST" id="patient_register" action="{% url 'patient:patient_register' %}">
+            <form method="POST" id="edit_profile" action="{% url 'patient:edit_profile' %}">
                 {% csrf_token %}
+
+                <!-- Title -->
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <select class="form-select" name="title" id="title" required>
+                        <option value="">-- Select Title --</option>
+                        <option value="Mr" {% if title == "Mr" %}selected{% endif %}>Mr.</option>
+                        <option value="Ms" {% if title == "Ms" %}selected{% endif %}>Ms.</option>
+                        <option value="Mrs" {% if title == "Mrs" %}selected{% endif %}>Mrs.</option>
+                        <option value="Dr" {% if title == "Dr" %}selected{% endif %}>Dr.</option>
+                        <option value="Prof" {% if title == "Prof" %}selected{% endif %}>Prof.</option>
+                    </select>
+                </div>
+
 
                 <!-- Fist Name -->
                 <div class="mb-3">
@@ -22,29 +36,34 @@
                 <!-- Date of Birth -->
                 <div class="mb-3">
                     <label class="form-label" for="dateofBirth">Date of Birth</label>
-                    <input type="date" name="date_of_birth" class="form-control" id="dobDate" placeholder="Date of Birth" value="{{date_of_birth}}">
+                    <input type="date" name="date_of_birth" class="form-control" id="dobDate" placeholder="Date of Birth" value="{{ date_of_birth|date:'Y-m-d' }}">
                 </div>
-
+                
                 <!-- Gender -->
                 <div class="mb-3">
                     <label class="form-label" for="gender">Gender</label>
+
                     <div class="form-check">
-                        <input type="radio" class="form-check-input" name="gender" id="maleRadio" value="M">
+                        <input type="radio" class="form-check-input" name="gender" id="maleRadio" value="M" {% if gender == 'M' %}checked{% endif %}>
                         <label for="maleRadio">Male</label>
                     </div>
+
                     <div class="form-check">
-                        <input type="radio" class="form-check-input" name="gender" id="femaleRadio" value="F">
+                        <input type="radio" class="form-check-input" name="gender" id="femaleRadio" value="F" {% if gender == 'F' %}checked{% endif %}>
                         <label for="femaleRadio">Female</label>
                     </div>
+
                     <div class="form-check">
-                        <input type="radio" class="form-check-input" name="gender" id="otherRadio" value="O">
+                        <input type="radio" class="form-check-input" name="gender" id="otherRadio" value="O" {% if gender == 'O' %}checked{% endif %}>
                         <label for="otherRadio">Other</label>
                     </div>
+
                     <div class="form-check">
-                        <input type="radio" class="form-check-input" name="gender" id="preferRadio" value="P">
+                        <input type="radio" class="form-check-input" name="gender" id="preferRadio" value="P" {% if gender == 'P' %}checked{% endif %}>
                         <label for="preferRadio">Prefer not to say</label>
                     </div>
                 </div>
+
 
                 <!-- Marital Status -->
                 <div class="mb-3">
@@ -73,7 +92,7 @@
 
                 <!-- Password -->
                 <div class="mb-3">
-                    <label class="form-label" for="password">Password</label>
+                    <label class="form-label" for="password">New Password</label>
                     <input type="password" name="password" class="form-control" id="passwordInput" value="{{password}}">
                     <!-- Indicate Password Strength -->
                     <div id="password-strength" class="mt-1"></div>
@@ -92,6 +111,7 @@
             
                 <div class="mb-3 text-center">
                     <button type="submit" class="btn btn-primary" id="btnSubmit" disabled>Update</button>
+                    <a href="{% url 'patient:patient_profile' %}" class="btn btn-secondary">Back</a>
                 </div>
             </form>
         </div>
@@ -103,18 +123,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', function(){
               
-        // Agree Terms and Conditions
-        const form = document.querySelector('#patient_register')
-        const agree = document.querySelector('#checkAgree');
-
-        form.onsubmit = function(event){
-            if(!agree.checked){
-                event.preventDefault();
-                alert("Please agree Terms and Condtions")
-            }
-        }
-        
-
         //////////////////////////////////////////////////////
         // Checking Password Strength and Matching
 
