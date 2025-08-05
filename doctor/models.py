@@ -6,7 +6,7 @@ class Department(models.Model):
         ('active', 'Active'),
         ('inactive', 'Inactive')
     ]
-
+ 
     dep_name = models.CharField(max_length=100, unique=True)
     dep_email = models.EmailField(max_length=100)
     dep_phone = models.CharField(max_length=20)

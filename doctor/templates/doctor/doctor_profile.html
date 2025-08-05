@@ -1,0 +1,25 @@
+{% extends 'doctor/base.html' %}
+{% block content %}
+    <div class="row justify-content-center align-items-center">
+<div class="profile-info border m-3 p-3">
+    <h3>Personal Information</h3>
+        <ul>
+            <li><strong>Department</strong>: {{department}} </li>
+            <li><strong>Name</strong>: {{fname}} {{lname}} </li>
+            <li><strong>Email</strong>: {{email}}</li>
+            <li><strong>DOB</strong>: {{date_of_birth}}</li>
+            <li><strong>Gender</strong>: {{gender}}</li>
+            <li><strong>License</strong>: {{license}}</li>
+            <li><strong>Specialisation</strong>: {{specialisation}}</li>
+            <li><strong>Phone</strong>: {{phone}}</li>
+            <li class="mb-2"><strong>Address</strong>: {{address}}</li>
+            <li><small>Registeration Date: {{created_at}} </small></li>
+            <li><small>Updated Date: {{updated_at}}</small></li>
+        </ul>
+    <div class="setting_buttons"></div>
+        <a href="{% url 'doctor:edit_password' %}"class="btn btn-warning me-2">Edit Password</a>
+        <a href="{% url 'appointment:availability' %}" class="btn btn-dark">Return</a>
+    </div>
+</div>
+</div>
+{% endblock %}
