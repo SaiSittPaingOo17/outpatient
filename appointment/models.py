@@ -60,6 +60,7 @@ class Appointment(models.Model):
         ('confirmed', 'Confirmed'),
         ('cancelled', 'Cancelled'),
         ('completed', 'Completed'),
+        ('due', 'Due'),
     ]
 
     REASON_CHOICES = [

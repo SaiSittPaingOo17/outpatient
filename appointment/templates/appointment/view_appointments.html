@@ -18,6 +18,7 @@
                             {% if appt.status == 'pending' %}bg-warning text-dark
                             {% elif appt.status == 'confirmed' %}bg-success
                             {% elif appt.status == 'cancelled' %}bg-danger
+                            {% elif appt.status == 'due' %}bg-secondary
                             {% endif %}">
                             {{ appt.status|title }}
                         </span><br>

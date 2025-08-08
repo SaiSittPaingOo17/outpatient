@@ -14,6 +14,9 @@ from patient.models import Patient
 from .forms import AppointmentForm
 from .decorators import doctor_login_required, patient_login_required
 
+from .utils import update_due_appointments
+
+
 def index(request):
     return render(request,'appointment/index.html')
 
@@ -110,6 +113,7 @@ def delete_availability(request, availability_id):
 
 @doctor_login_required
 def doctor_appointments(request):
+    update_due_appointments()
     doctor = request.doctor
     appointments = Appointment.objects.filter(doctor=doctor).order_by('-created_at')
     return render(request, 'appointment/doctor_appointments.html', {
@@ -270,6 +274,7 @@ def book_appointment(request, availability_id):
 
 @patient_login_required
 def view_appointments(request):
+    update_due_appointments()
     patient_id = request.session.get('patient_id')
     patient = get_object_or_404(Patient, id=patient_id)
     

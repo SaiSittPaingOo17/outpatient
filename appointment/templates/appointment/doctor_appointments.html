@@ -7,7 +7,14 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
                     <strong>{{ appt.patient.fname }} {{ appt.patient.lname }}</strong> on {{ appt.appointed_datetime }}<br>
-                    Status: <span class="badge bg-secondary">{{ appt.status }}</span>
+                    Status: <span class="badge 
+                            {% if appt.status == 'pending' %}bg-warning text-dark
+                            {% elif appt.status == 'confirmed' %}bg-success
+                            {% elif appt.status == 'cancelled' %}bg-danger
+                            {% elif appt.status == 'due' %}bg-secondary
+                            {% endif %}">
+                            {{ appt.status|title }}
+                        </span><br>
                 </div>
                 {% if appt.status == 'pending' %}
                 <a href="{% url 'appointment:confirm_appointment' appt.id %}" class="btn btn-sm btn-success">Confirm</a>
