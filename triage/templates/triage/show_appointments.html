@@ -1,0 +1,27 @@
+{% extends 'triage/layout.html' %}
+{% block content %}
+    <h2>Department: </h2> 
+    Appointments
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="list-text">
+                        Appointment ID: <br/>
+                        Appointed Date: <br/>
+                        Patient ID: <br/>
+                        Patient Name: <br/>
+                        Doctor Name: <br/>
+                        <a href="" class="btn btn-primary">Fill Triage</a>
+                    
+                    <!-- <div class="list-button">
+                        {% if appt.status in 'pending,confirmed' and appt.is_cancellable %}
+                            <a href="{% url 'appointment:cancel_appointment' appt.id %}" 
+                               class="btn btn-outline-danger btn-sm">Cancel Appointment</a>
+                        {% elif appt.status in 'pending,confirmed' and not appt.is_cancellable %}
+                            <small class="text-muted">Cannot cancel<br>(less than 2 days)</small>
+                        {% endif %}
+                    </div> -->
+                    </div>
+            </li>
+
+        </ul>
+{% endblock %}

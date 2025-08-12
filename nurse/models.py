@@ -18,7 +18,7 @@ class Nurse(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     fname = models.CharField(max_length=64)
-    lanme = models.CharField(max_length=64)
+    lname = models.CharField(max_length=64)
     department = models.ForeignKey(Department, on_delete= models.CASCADE, related_name='nurses')
     gender = models.CharField(max_length=20, choices=GENDER_CHOICE)
     date_of_birth = models.DateField()
