@@ -3,14 +3,15 @@
     <h2>Department: </h2> 
     Appointments
         <ul class="list-group">
+            {% for appointment in appointments %}
             <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="list-text">
-                        Appointment ID: <br/>
-                        Appointed Date: <br/>
-                        Patient ID: <br/>
-                        Patient Name: <br/>
-                        Doctor Name: <br/>
-                        <a href="" class="btn btn-primary">Fill Triage</a>
+                <div class="list-text">
+                    Appointment ID: {{ appointment.id }} <br/>
+                    Appointed Date: {{ appointment.appointed_datetime }} <br/>
+                    Patient ID: {{ appointment.patient_id }}<br/>
+                    Patient Name: {{ appointment.patient }}<br/>
+                    Doctor Name: {{ appointment.doctor }}<br/>
+                    <a href="" class="btn btn-primary">Fill Triage</a>
                     
                     <!-- <div class="list-button">
                         {% if appt.status in 'pending,confirmed' and appt.is_cancellable %}
@@ -22,6 +23,9 @@
                     </div> -->
                     </div>
             </li>
+            {% empty %}
+            <li class="list-group-item">No available appointment</li>
+            {% endfor %}
 
         </ul>
 {% endblock %}

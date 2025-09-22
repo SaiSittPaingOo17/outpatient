@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import Nurse
 
+
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 
