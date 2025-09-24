@@ -6,20 +6,27 @@ class TriageForm(forms.ModelForm):
     class Meta:
         model = Triage
         fields = [
-            'appt_id',               
-            'blood_pressure',        
-            'heart_rate',          
-            'respiratory_rate',      
-            'temperature',           
-            'oxygen_saturation',     
-            'weight',                
-            'height',                
-            'bmi',                   
-            'chief_complaint', 
-            'nurse_notes',       
+            'appointment',
+            'patient',
+            'nurse',
+            'department',
+            'temperature',
+            'pulse_rate',
+            'resp_rate',
+            'oxygen_saturation',
+            'systolic_pressure',
+            'diastolic_pressure',
+            'weight',
+            'height',
+            'blood_sugar',
+            'allergies',
+            'last_menstrual_period',
+            'note',
+            'status',
         ]
-        widgets = {
-            'chief_complaint': forms.Textarea(attrs={'rows': 2}),
-            'nurse_notes': forms.Textarea(attrs={'rows': 3}),
-        }
+        exclude = ['appointment', 'nurse', 'patient', 'department', 'status']
+        # widgets = {
+        #     'chief_complaint': forms.Textarea(attrs={'rows': 2}),
+        #     'nurse_notes': forms.Textarea(attrs={'rows': 3}),
+        # }
         

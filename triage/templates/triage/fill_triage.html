@@ -2,83 +2,93 @@
 
 {% block content %}
 <div class="container mt-4">
-
     <h5>Appointment Information</h5>
     <ul>
         <li><strong>Appointment ID:</strong> {{ appointment.id }}</li>
-        <li><strong>Appointed Date:</strong> {{ appointment.appointment_date|date:"Y-m-d H:i" }}</li>
+        <li><strong>Appointed Date:</strong> {{ appointment.appointed_datetime }}</li>
         <li><strong>Patient ID:</strong> {{ appointment.patient.id }}</li>
-        <li><strong>Patient Name:</strong> {{ appointment.patient.pat_fname }} {{ appointment.patient.pat_sname }}</li>
+        <li><strong>Patient Name:</strong> {{ appointment.patient }} {{ appointment.patient.pat_sname }}</li>
         <li><strong>Doctor ID:</strong> {{ appointment.doctor.id }}</li>
-        <li><strong>Doctor Name:</strong> {{ appointment.doctor.doc_fname }} {{ appointment.doctor.doc_sname }}</li>
+        <li><strong>Doctor Name:</strong> {{ appointment.doctor }} {{ appointment.doctor.doc_sname }}</li>
     </ul>
+    <h5>This triage form is filled by Nures: <strong>{{ nurse }}</strong> </h5>
     <hr>
 
     <h4>Fill Triage Form</h4>
-    <form method="post" action="">
+    <div class="triage-form mb-5 border border-2 rounded p-3">
+        <form method="POST" action="{% url 'triage:fill_triage' appointment.id %}">
         {% csrf_token %}
 
-        <div class="mb-3">
-            <label class="form-label">Temperature (°C)</label>
-            <input type="number" step="0.1" name="temperature" class="form-control" min="25" max="45" required>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Temperature (°C)</label>
+                <input type="number" step="0.1" name="temperature" class="form-control" min="25" max="45" required>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Pulse Rate (bpm)</label>
-            <input type="number" name="pulse_rate" class="form-control" min="0" max="300" required>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Pulse Rate (bpm)</label>
+                <input type="number" name="pulse_rate" class="form-control" min="0" max="300" required>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Respiratory Rate (breaths/min)</label>
-            <input type="number" name="resp_rate" class="form-control" min="0" max="80" required>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Respiratory Rate (breaths/min)</label>
+                <input type="number" name="resp_rate" class="form-control" min="0" max="50" required>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Oxygen Saturation (SpO₂ %)</label>
-            <input type="number" name="oxygen_saturation" class="form-control" min="0" max="100">
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Oxygen Saturation (SpO₂ %)</label>
+                <input type="number" name="oxygen_saturation" class="form-control" min="0" max="100">
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Systolic Pressure (mmHg)</label>
-            <input type="number" name="systolic_pressure" class="form-control" min="50" max="300" required>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Systolic Pressure (mmHg)</label>
+                <input type="number" name="systolic_pressure" class="form-control" min="50" max="300" required>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Diastolic Pressure (mmHg)</label>
-            <input type="number" name="diastolic_pressure" class="form-control" min="30" max="200" required>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Diastolic Pressure (mmHg)</label>
+                <input type="number" name="diastolic_pressure" class="form-control" min="30" max="200" required>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Weight (kg)</label>
-            <input type="number" step="0.1" name="weight" class="form-control" min="1" max="500" required>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Weight (kg)</label>
+                <input type="number" step="0.1" name="weight" class="form-control" min="1" max="500" required>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Height (m)</label>
-            <input type="number" step="0.01" name="height" class="form-control" min="0.3" max="3" required>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Height (m)</label>
+                <input type="number" step="0.01" name="height" class="form-control" min="0.3" max="3" required>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Blood Sugar (mmol/L)</label>
-            <input type="number" step="0.1" name="blood_sugar" class="form-control">
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Blood Sugar (mmol/L)</label>
+                <input type="number" step="0.1" name="blood_sugar" class="form-control">
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Allergies</label>
-            <input type="text" name="allergies" class="form-control" maxlength="128">
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Allergies</label>
+                <input type="text" name="allergies" class="form-control" maxlength="128">
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Last Menstrual Period</label>
-            <input type="date" name="last_menstrual_period" class="form-control">
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Last Menstrual Period</label>
+                <input type="date" name="last_menstrual_period" class="form-control">
+                <small class="text-info">*** Only for Obstetrics and Gynaecology</small>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Notes</label>
-            <textarea name="note" class="form-control" rows="3"></textarea>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Notes</label>
+                <textarea name="note" class="form-control" rows="3"></textarea>
+            </div>
 
-        <button type="submit" class="btn btn-primary">Save Triage</button>
-    </form>
+            <div class="triage-button d-flex justify-content-around align-items-center">
+                <button type="submit" class="btn btn-outline-success">Save</button>
+                <input type="reset" class="btn btn-outline-warning" value="Clear">
+                <a href="{% url 'triage:show_appointments' %}" class="btn btn-outline-dark">Return</a>
+            </div>
+            
+        </form>
+
+    </div>
+    
 </div>
 {% endblock %}

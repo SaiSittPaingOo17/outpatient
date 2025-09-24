@@ -17,6 +17,7 @@ def patient_register(request):
         # print('Post Data', request.POST)
         form = PatientForm(request.POST)
         if form.is_valid():
+            
             # print('Form Validataion: ',form.is_valid)
             # if not form.is_valid():
                 # print('Form Error: ',form.errors)

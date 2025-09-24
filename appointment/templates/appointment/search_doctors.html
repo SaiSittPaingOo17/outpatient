@@ -46,8 +46,8 @@
         <div class="row">
             {% for doctor in doctors %}
                 <div class="col-lg-6 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
+                    <div class="card border border-success">
+                        <div class="card-body h-100">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h5 class="card-title mb-1">Dr. {{ doctor.fname }} {{ doctor.lname|default:'' }}</h5>
                                 <span class="badge bg-primary">{{ doctor.department.dep_name }}</span>
