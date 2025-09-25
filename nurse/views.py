@@ -39,3 +39,8 @@ def nurse_login(request):
             return render(request, 'nurse/nurse_login.html')
 
     return render(request, 'nurse/nurse_login.html')
+
+def nurse_logout(request):
+    request.session.flush()
+    messages.success(request, 'You have been logged out.')
+    return HttpResponseRedirect(reverse('nurse:nurse_login'))

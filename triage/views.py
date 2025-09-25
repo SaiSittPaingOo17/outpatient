@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from appointment.models import Appointment
-from .models import Nurse 
+from .models import Triage 
 from .decorators import nurse_login_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -47,7 +47,7 @@ def fill_triage(request, appointment_id):
 
             form.save()
             messages.success(request, "Triage Form is filled.")
-            return render(request,'triage/show_appointments.html')
+            return HttpResponseRedirect(reverse('triage:show_appointments'))
         else:
             temperature = request.POST['temperature']
             pulse_rate = request.POST['pulse_rate']
@@ -86,4 +86,12 @@ def fill_triage(request, appointment_id):
         "form": form,
         "appointment": appointment,
         "nurse": nurse,
+    })
+
+def log(request):
+    triages = Triage.objects.all()
+    print(triages)
+
+    return render(request,'triage/log.html',{
+        'triages': triages,
     })

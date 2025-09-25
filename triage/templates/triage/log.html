@@ -1,0 +1,28 @@
+{% extends 'triage/layout.html' %}
+{% block content %}
+    Show filled Patients' Triages
+
+    <h3>Triages</h3>
+    <div class="row">
+        {% for triage in triages %}
+        <div class="card-items col-lg-6 mb-3">
+            <div class="card p-3 border border-primary-subtle">
+                <p>Trigae ID: <strong>{{ triage.id }}</strong></p>
+                <p>Appointment ID: <strong>{{ triage.appointment.id }}</strong></p>
+                <p>Patient: <strong>{{ triage.appointment.patient }}</strong></p>
+                <p>Doctor: <strong>{{ triage.appointment.doctor}}</strong></p>
+                <p>Nurse: <strong>{{ triage.nurse }}</strong> </p>
+                <p>Time: <strong>{{ triage.appointment.appointed_datetime }}</strong></p>
+                <button class="btn btn-outline-success">View</a>
+
+            </div>
+
+        </div>
+        {% empty %}
+        <p>No filled triage forms.</p>
+        {% endfor %}
+
+    </div>
+    
+
+{% endblock %}
