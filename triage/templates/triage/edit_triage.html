@@ -1,0 +1,86 @@
+{% extends "triage/layout.html" %}
+{% block content %}
+{% if triage %}
+<div class="edit_triage mb-5 bg-light p-3 border border-info rounded shadow">
+    <div class="patient-info">
+        <h4>Patient</h4>
+        <p><strong>ID:</strong> {{ triage.patient.id }}</p>
+        <p><strong>Name:</strong> {{ triage.patient }}</p>
+        <p><strong>Age:</strong> {{ triage.patient.age }}</p>
+        <p><strong>Gender:</strong> {{ triage.patient.gender }}</p>
+    </div>
+
+    <form action="{% url 'triage:edit_triage' triage.id %}" method="POST">
+        {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Temperature (°C)</label>
+                <input type="number" step="0.1" name="temperature" class="form-control border-dark" min="25" max="45" value="{{triage.temperature}}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Pulse Rate (bpm)</label>
+                <input type="number" name="pulse_rate" class="form-control border-dark" min="0" max="300" value="{{triage.pulse_rate}}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Respiratory Rate (breaths/min)</label>
+                <input type="number" name="resp_rate" class="form-control border-dark" min="0" max="50" value="{{triage.resp_rate}}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Oxygen Saturation (SpO₂ %)</label>
+                <input type="number" name="oxygen_saturation" class="form-control border-dark" min="0" max="100" value="{{triage.oxygen_saturation}}" >
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Systolic Pressure (mmHg)</label>
+                <input type="number" name="systolic_pressure" class="form-control border-dark" min="50" max="300" value="{{triage.systolic_pressure}}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Diastolic Pressure (mmHg)</label>
+                <input type="number" name="diastolic_pressure" class="form-control border-dark" min="30" max="200" value="{{triage.diastolic_pressure}}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Weight (kg)</label>
+                <input type="number" step="0.1" name="weight" class="form-control border-dark" min="1" max="500" value="{{triage.weight}}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Height (m)</label>
+                <input type="number" step="0.01" name="height" class="form-control border-dark" min="0.3" max="3" value="{{triage.height}}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Blood Sugar (mmol/L)</label>
+                <input type="number" step="0.1" name="blood_sugar" class="form-control border-dark" value="{{triage.blood_sugar}}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Allergies</label>
+                <input type="text" name="allergies" class="form-control border-dark" maxlength="128" value="{{triage.allergies}}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Last Menstrual Period</label>
+                <input type="date" name="last_menstrual_period" class="form-control border-dark" value="{{triage.last_menstrual_period}}">
+                <small class="text-info">***For Obstetrics and Gynaecology</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Notes</label>
+                <textarea name="note" class="form-control border-dark" rows="3">{{triage.note}}</textarea>
+            </div>
+
+            <div class="triage-button d-flex justify-content-around align-items-center">
+                <button type="submit" class="btn btn-outline-success col-5">Update</button>
+                <!-- <input type="reset" class="btn btn-outline-light" value="Clear"/> -->
+                <a href="{% url 'triage:triage_details' triage.id %}" class="btn btn-outline-dark col-5">Return</a>
+            </div>
+            
+    </form>
+</div>
+{% endif %}
+{% endblock %}

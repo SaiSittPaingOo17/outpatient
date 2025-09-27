@@ -34,6 +34,8 @@ class Doctor(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="doctors")
     fname = models.CharField(max_length=64)
     lname = models.CharField(max_length=64)
+    # gender
+    # date_of_birth
     license = models.CharField(max_length=20, unique=True)
     specialisation = models.CharField(max_length=64)
     email = models.EmailField(max_length=64, unique=True)

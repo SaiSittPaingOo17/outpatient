@@ -1,8 +1,10 @@
 {% extends 'triage/layout.html' %}
 {% block content %}
-    Show filled Patients' Triages
-
-    <h3>Triages</h3>
+    <div class="d-flex justify-content-between mb-2">
+        <h3>Triages</h3>
+        <a href="{% url 'triage:show_appointments' %}" class="btn btn-dark">Back</a>
+    </div>
+    
     <div class="row">
         {% for triage in triages %}
         <div class="card-items col-lg-6 mb-3">
@@ -13,7 +15,7 @@
                 <p>Doctor: <strong>{{ triage.appointment.doctor}}</strong></p>
                 <p>Nurse: <strong>{{ triage.nurse }}</strong> </p>
                 <p>Time: <strong>{{ triage.appointment.appointed_datetime }}</strong></p>
-                <button class="btn btn-outline-success">View</a>
+                <a href="{% url 'triage:triage_details' triage.id %}" class="btn btn-outline-success">View</a>
 
             </div>
 

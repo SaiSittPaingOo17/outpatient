@@ -1,0 +1,58 @@
+{% extends 'triage/layout.html' %}
+{% block content %}
+{% if triage %}
+<div class="p-2">
+    <div class="row d-flex mb-2">
+        <div class="col-lg-6 border border-dark rounded">
+            <p><strong>Triage ID:</strong> {{ triage.id }}</p>
+            <p><strong>Created at:</strong> {{ triage.created_at }}</p>
+            <p><strong>Appointment ID:</strong> {{ triage.appointment.id }}</p>
+            <p><strong>Appointed Time:</strong> {{ triage.appointment.appointed_datetime }}</p>
+            <p><strong>Doctor:</strong> {{ triage.appointment.doctor }}</p>
+            <!-- <p><strong>Nurse:</strong> {{ triage.nurse }}</p> -->
+
+        </div>
+        <div class="patient-info col-lg-6 border border-dark rounded">
+            <h4>Patient</h4>
+            <p><strong>ID:</strong> {{ triage.patient.id }}</p>
+            <p><strong>Name:</strong> {{ triage.patient }}</p>
+            <p><strong>Age:</strong> {{ triage.patient.age }}</p>
+            <p><strong>Gender:</strong> {{ triage.patient.gender }}</p>
+            </div>  
+    </div>
+
+    <div class="row p-3 mb-3 border rounded-2 border-dark">
+        <h4 class="text-center fw-bold text-decoration-underline">Triage Data</h4>
+        <div class="triage_text d-flex mt-2">
+            <div class="triage_1 col-lg-6">
+                <p><strong>Temperature:</strong> {{ triage.temperature }} °C</p>
+                <p><strong>Pulse Rate:</strong> {{ triage.pulse_rate }}/min</p>
+                <p><strong>Respiratory Rate:</strong> {{ triage.resp_rate }}/min</p>
+                <p><strong>Oxygen:</strong> {{ triage.oxygen_saturation }}%</p>
+                <p><strong>Blood Pressure:</strong> {{ triage.systolic_pressure }}/{{ triage.diastolic_pressure }} mmHg</p>
+            </div>
+            <div class="triage_2">
+                <p><strong>Weight:</strong> {{ triage.weight }} kg</p>
+                <p><strong>Height:</strong> {{ triage.height }} m</p>
+                <p><strong>Blood Glucose:</strong> {{ triage.blood_sugar }} mmol/L</p>
+                <p><strong>Allergies:</strong> {{ triage.allergies }}</p>
+            </div>
+        </div>
+        
+        
+        {% if triage.last_menstrual_period or triage.note %}
+            {% if triage.last_menstrual_period %}
+                <p><strong>LMP:</strong> {{ triage.last_menstrual_period }}</p>
+            {% endif %}
+            {% if triage.note %}
+                <p><strong>Note:</strong> {{ triage.note }}</p>
+            {% endif %}
+        {% endif %}
+        <div class="details_buttons d-flex justify-content-around">
+            <a href="{% url 'triage:edit_triage' triage.id %}" class="btn btn-outline-warning col-5">Edit</a>
+            <a href="{% url 'triage:log' %}" class="btn btn-outline-dark col-5">Back</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
