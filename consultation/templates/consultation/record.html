@@ -1,0 +1,128 @@
+{% extends 'consultation/layout.html' %}
+{% block content %}
+
+{% if triage %}
+<div class="p-2">
+    <div class="row d-flex mb-2">
+        <div class="col-lg-6 border border-dark rounded">
+            <p><strong>Triage ID:</strong> {{ triage.id }}</p>
+            <p><strong>Created at:</strong> {{ triage.created_at }}</p>
+            <p><strong>Appointment ID:</strong> {{ triage.appointment.id }}</p>
+            <p><strong>Appointed Time:</strong> {{ triage.appointment.appointed_datetime }}</p>
+            <p><strong>Doctor:</strong> {{ triage.appointment.doctor }}</p>
+            <p><strong>Nurse:</strong> {{ triage.nurse }}</p>
+
+        </div>
+        <div class="patient-info col-lg-6 border border-dark rounded">
+            <h4>Patient</h4>
+            <p><strong>ID:</strong> {{ triage.patient.id }}</p>
+            <p><strong>Name:</strong> {{ triage.patient }}</p>
+            <p><strong>Age:</strong> {{ triage.patient.age }}</p>
+            <p><strong>Gender:</strong> {{ triage.patient.gender }}</p>
+            </div>  
+    </div>
+
+    <div class="row p-3 mb-3 border rounded-2 border-dark">
+        <h4 class="text-center fw-bold text-decoration-underline">Triage Data</h4>
+        <div class="triage_text d-flex mt-2">
+            <div class="triage_1 col-lg-6">
+                <p><strong>Temperature:</strong> {{ triage.temperature }} °C</p>
+                <p><strong>Pulse Rate:</strong> {{ triage.pulse_rate }}/min</p>
+                <p><strong>Respiratory Rate:</strong> {{ triage.resp_rate }}/min</p>
+                <p><strong>Oxygen:</strong> {{ triage.oxygen_saturation }}%</p>
+                <p><strong>Blood Pressure:</strong> {{ triage.systolic_pressure }}/{{ triage.diastolic_pressure }} mmHg</p>
+            </div>
+            <div class="triage_2">
+                <p><strong>Weight:</strong> {{ triage.weight }} kg</p>
+                <p><strong>Height:</strong> {{ triage.height }} m</p>
+                <p><strong>Blood Glucose:</strong> {{ triage.blood_sugar }} mmol/L</p>
+                <p><strong>Allergies:</strong> {{ triage.allergies }}</p>
+            </div>
+        </div>
+             
+        {% if triage.last_menstrual_period or triage.note %}
+            {% if triage.last_menstrual_period %}
+                <p><strong>LMP:</strong> {{ triage.last_menstrual_period }}</p>
+            {% endif %}
+            {% if triage.note %}
+                <p><strong>Note:</strong> {{ triage.note }}</p>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="row p-3 mb-3 border rounded border-success bg-light">
+        <h3 class="text-center">Consultation Record</h3>
+        <div class="consultation-form mb-5">
+        <form method="POST" action="{% url 'consultation:record' triage.id %}">
+        {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="chief_comp" class="form-label fw-bold">Chief Complaint</label>
+                <input type="text" id="chief_comp" name="chief_comp" class="form-control" value="{{chief_comp}}" required>
+                </div>
+
+                <div class="mb-3">
+                <label for="present_ill" class="form-label fw-bold">Present Illness</label>
+                <textarea id="present_ill" name="present_ill" class="form-control" rows="3" required>{{present_ill}}</textarea>
+                </div>
+
+                <div class="mb-3">
+                <label for="past_med" class="form-label fw-bold">Past Medical History</label>
+                <textarea id="past_med" name="past_med" class="form-control" rows="3" required>{{past_med}}</textarea>
+                </div>
+                    
+                <div class="mb-3">
+                <label for="past_sur" class="form-label fw-bold">Past Surgical History</label>
+                <textarea id="past_sur" name="past_sur" class="form-control" rows="3" required>{{past_sur}}</textarea>
+                </div>
+                
+                <div class="mb-3">
+                <label for="medica_his" class="form-label fw-bold">Medication History</label>
+                <textarea id="medica_his" name="medica_his" class="form-control" rows="3" required>{{medica_his}}</textarea>
+                </div>
+                
+                <div class="mb-3">
+                <label for="og_his" class="form-label fw-bold">Obstetric / Gynaecological History</label>
+                <textarea id="og_his" name="og_his" class="form-control" rows="3" required>{{og_his}}</textarea>
+                </div>
+            
+                <div class="mb-3">
+                <label for="fam_his" class="form-label fw-bold">Family History</label>
+                <textarea id="fam_his" name="fam_his" class="form-control" rows="3" required>{{fam_his}}</textarea>
+                </div>
+                
+                <div class="mb-3">
+                <label for="soc_his" class="form-label fw-bold">Social History</label>
+                <textarea id="soc_his" name="soc_his" class="form-control" rows="3" required>{{soc_his}}</textarea>
+                </div>
+               
+                <div class="mb-3">
+                <label for="phy_exam" class="form-label fw-bold">Physical Examination</label>
+                <textarea id="phy_exam" name="phy_exam" class="form-control" rows="3" required>{{phy_exam}}</textarea>
+                </div>
+
+                <div class="mb-3">
+                <label for="diag" class="form-label fw-bold">Diagnosis</label>
+                <textarea id="diag" name="diag" class="form-control" rows="3" required>{{diag}}</textarea>
+                </div>
+
+                <div class="mb-3">
+                <label for="notes" class="form-label fw-bold">Additional Notes</label>
+                <textarea id="notes" name="notes" class="form-control" rows="3">{{notes}}</textarea>
+                </div>
+
+            <div class="consultation-button d-flex justify-content-around align-items-center">
+                <button type="submit" class="btn btn-outline-primary">Save Consultation</button>
+                <input type="reset" class="btn btn-outline-info" value="Clear">
+                <a href="{% url 'consultation:show_triage' %}" class="btn btn-outline-dark">Cancel</a>
+            </div>
+            
+        </form>
+
+    </div>
+
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

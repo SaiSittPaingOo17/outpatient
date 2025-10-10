@@ -20,18 +20,17 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'doctor:dashboard' %}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'appointment:availability' %}">My Availability</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'appointment:doctor_appointments' %}">My Appointments</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'doctor:dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'consultation:show_triage' %}">Patients</a>
                     </li>
-                    
                 </ul>
                 
                 <ul class="navbar-nav">
@@ -43,53 +42,6 @@
                             <li><a class="dropdown-item" href="{% url 'doctor:doctor_profile' %}" onclick="alert('Navigate to Profile Settings')">Profile Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'doctor:doctor_logout' %}">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    {% endif %}
-
-    <!-- Patient Navigation Bar -->
-    {% if patient %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'appointment:search_doctors' %}">
-                <i class="fas fa-user-injured"></i> Patient Portal
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavPatient">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNavPatient">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'appointment:search_doctors' %}">
-                            <i class="fas fa-search"></i> Search Doctors
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'appointment:view_appointments' %}">
-                            <i class="fas fa-calendar-alt"></i> My Appointments
-                        </a>
-                    </li>
-                </ul>
-                
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPatient" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> {{ patient.fname }} {{ patient.lname }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'patient:patient_profile' %}" onclick="alert('Go to Profile Settings')">
-                                <i class="fas fa-user-edit"></i> Profile Settings
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'patient:patient_logout' %}">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a></li>
                         </ul>
                     </li>
                 </ul>
