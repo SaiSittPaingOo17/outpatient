@@ -28,5 +28,5 @@ class Consultation(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return f"Consultated by {self.doctor} at {self.consult_time}"
+        return f"Consultated by {self.doctor} at {self.created_at}"
 

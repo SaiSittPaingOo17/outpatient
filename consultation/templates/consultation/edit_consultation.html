@@ -1,0 +1,79 @@
+{% extends 'consultation/layout.html' %}
+{% block content %}
+{% if consultation %}
+<div class="edit_consultation mb-5 bg-light p-3 border border-info rounded shadow">
+    <div class="patient-info">
+        <h4>Patient</h4>
+        <p><strong>ID:</strong> {{ appointment.id }}</p>
+        <p><strong>Name:</strong> {{ appointment.patient }}</p>
+        <p><strong>Age:</strong> {{ appointment.patient.age }}</p>
+        <p><strong>Gender:</strong> {{ appointment.patient.gender }}</p>
+    </div>
+
+    <form action="{% url 'consultation:edit_consultation' consultation.id %}" method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="chief_comp" class="form-label fw-bold">Chief Complaint</label>
+            <input type="text" id="chief_comp" name="chief_comp" class="form-control" value="{{ consultation.chief_comp}}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="present_ill" class="form-label fw-bold">Present Illness</label>
+          <textarea id="present_ill" name="present_ill" class="form-control" rows="3" required>{{ consultation.present_ill}}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="past_med" class="form-label fw-bold">Past Medical History</label>
+            <textarea id="past_med" name="past_med" class="form-control" rows="3" required>{{ consultation.past_med}}</textarea>
+        </div>
+                    
+        <div class="mb-3">
+           <label for="past_sur" class="form-label fw-bold">Past Surgical History</label>
+           <textarea id="past_sur" name="past_sur" class="form-control" rows="3" required>{{ consultation.past_sur }}</textarea>
+        </div>
+                
+        <div class="mb-3">
+            <label for="medica_his" class="form-label fw-bold">Medication History</label>
+            <textarea id="medica_his" name="medica_his" class="form-control" rows="3" required>{{ consultation.medica_his }}</textarea>
+        </div>
+                
+        <div class="mb-3">
+            <label for="og_his" class="form-label fw-bold">Obstetric / Gynaecological History</label>
+            <textarea id="og_his" name="og_his" class="form-control" rows="3" required>{{ consultation.og_his }}</textarea>
+        </div>
+            
+        <div class="mb-3">
+            <label for="fam_his" class="form-label fw-bold">Family History</label>
+            <textarea id="fam_his" name="fam_his" class="form-control" rows="3" required>{{ consultation.fam_his }}</textarea>
+        </div>
+                
+        <div class="mb-3">
+            <label for="soc_his" class="form-label fw-bold">Social History</label>
+            <textarea id="soc_his" name="soc_his" class="form-control" rows="3" required>{{ consultation.soc_his }}</textarea>
+        </div>
+               
+        <div class="mb-3">
+            <label for="phy_exam" class="form-label fw-bold">Physical Examination</label>
+            <textarea id="phy_exam" name="phy_exam" class="form-control" rows="3" required>{{ consultation.phy_exam }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="diag" class="form-label fw-bold">Diagnosis</label>
+            <textarea id="diag" name="diag" class="form-control" rows="3" required>{{ consultation.diag }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="notes" class="form-label fw-bold">Additional Notes</label>
+            <textarea id="notes" name="notes" class="form-control" rows="3">{{ consultation.notes }}</textarea>
+        </div>
+
+        <div class="consultation-button d-flex justify-content-around align-items-center">
+            <button type="submit" class="btn btn-outline-primary">Update</button>
+            <input type="reset" class="btn btn-outline-info" value="Clear">
+            <a href="{% url 'consultation:show_consultation' %}" class="btn btn-outline-dark">Cancel</a>
+        </div>                 
+    </form>
+                
+</div>
+{% endif %}
+{% endblock %}

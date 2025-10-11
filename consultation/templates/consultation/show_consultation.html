@@ -1,0 +1,25 @@
+{% extends 'consultation/layout.html' %}
+{% block content %}
+    <div class="row">
+        {% for consultation in consultations %}
+        <div class="card-items col-lg-6 mb-3">
+            <div class="card p-3 border border-primary-subtle">
+                <p>Consultation ID: <strong>{{ consultation.id }}</strong></p>
+                <p>Patient: <strong>{{ consultation.appointment.patient }}</strong></p>
+                <p>Doctor: <strong>{{ consultation.doctor}}</strong></p>
+                <p>Chief Complaint: <strong>{{ consultation.chief_comp}}</strong></p>
+                <p>Diagnosis: <strong>{{ consultation.diag }}</strong></p>
+                <p>Appointed Time: <strong>{{ consultation.appointment.appointed_datetime }}</strong></p>
+                <p>Consulted Time: <strong>{{ consultation.created_at }}</strong></p>
+                <a href="{% url 'consultation:edit_consultation' consultation.id %}" class="btn btn-outline-success">Edit Consulting</a>
+            </div>
+        </div>
+
+        {% empty %}
+        <p>No filled triage forms.</p>
+
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

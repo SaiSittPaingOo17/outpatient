@@ -1,4 +1,7 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 from appointment.decorators import doctor_login_required
 from triage.models import Triage
 from appointment.models import Appointment
@@ -43,6 +46,7 @@ def record(request, triage_id):
         return redirect('consultation:show_triage')  # redirect instead of showing the form again
 
     if request.method == "POST":
+        
         form = ConsultationForm(request.POST)
 
         if form.is_valid():
@@ -88,4 +92,69 @@ def record(request, triage_id):
         'doctor': doctor,
         'appointment': appointment,
         'form': form,
+    })
+
+@doctor_login_required
+def show_consultation(request):
+    doctor = request.doctor
+
+    #double underscore: 
+    # To access the Patient model (which is linked through the Appointment model), you must use double underscores (__), not an underscore.
+    consultations = Consultation.objects.filter(doctor=doctor).select_related('appointment__patient', 'doctor')
+
+    return render(request, 'consultation/show_consultation.html',{
+        'consultations': consultations,
+    })
+
+@doctor_login_required
+def edit_consultation(request, consultation_id):
+    consultation = Consultation.objects.get(id=consultation_id)
+    appointment = consultation.appointment
+    doctor = request.doctor
+
+    if request.method == 'POST':
+        form = ConsultationForm(request.POST, instance=consultation)
+
+        if form.is_valid():
+            consultation = form.save(commit=False)
+            consultation.doctor = doctor
+            consultation.appointment = appointment
+            # print(request.POST)
+            consultation.save()
+            messages.success(request,'Consultation is updated.')
+            return HttpResponseRedirect(reverse('consultation:show_consultation'))
+        else:
+            chief_comp = request.POST['chief_comp']
+            present_ill = request.POST['present_ill']
+            past_med = request.POST['past_med']
+            past_sur = request.POST['past_sur']
+            medica_his = request.POST['medica_his']
+            og_his = request.POST['og_his']
+            fam_his = request.POST['fam_his']
+            soc_his = request.POST['soc_his']
+            phy_exam = request.POST['phy_exam']
+            diag = request.POST['diag']
+            notes = request.POST['notes']
+
+            messages.warning(request, 'Please fill the form completely')
+            return render(request, 'consultation/edit_consultation.html',{
+                'chief_comp': chief_comp,
+                'present_ill': present_ill,
+                'past_med': past_med,
+                'past_sur': past_sur,
+                'medica_his': medica_his,
+                'og_his': og_his,
+                'fam_his': fam_his,
+                'soc_his': soc_his,
+                'phy_exam': phy_exam,
+                'diag': diag,
+                'notes': notes,
+            })   
+    else:
+        form = ConsultationForm(instance=consultation)
+
+    return render(request, 'consultation/edit_consultation.html', {
+    'consultation': consultation,
+    'appointment': appointment,
+    'form': form,
     })
