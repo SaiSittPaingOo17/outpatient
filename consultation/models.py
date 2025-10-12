@@ -25,8 +25,29 @@ class Consultation(models.Model):
     notes = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=15, choices=STATUS_CHOICE, default='active')
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"Consultated by {self.doctor} at {self.created_at}"
 
+class PrescriptionType(models.Model):
+    TYPE_CHOICES = [
+        ('laboratory', 'Laboratory'),
+        ('medication','Medication'),
+    ]
+    prescription_type = models.CharField(max_length=30, choices=TYPE_CHOICES, default='medication')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Prescription Type : {self.prescription_type}'
+
+class Prescription(models.Model):
+    prescription_type = models.ForeignKey(PrescriptionType, on_delete=models.CASCADE)
+    consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE)
+    prescription = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Precription : {self.prescription}"

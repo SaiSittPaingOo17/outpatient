@@ -103,6 +103,7 @@ def show_consultation(request):
     consultations = Consultation.objects.filter(doctor=doctor).select_related('appointment__patient', 'doctor')
 
     return render(request, 'consultation/show_consultation.html',{
+        'doctor': doctor,
         'consultations': consultations,
     })
 
@@ -154,7 +155,20 @@ def edit_consultation(request, consultation_id):
         form = ConsultationForm(instance=consultation)
 
     return render(request, 'consultation/edit_consultation.html', {
+    'doctor': doctor,
     'consultation': consultation,
     'appointment': appointment,
     'form': form,
+    })
+
+@doctor_login_required
+def make_prescription(request, consultation_id):
+    doctor = request.doctor
+    consultation = Consultation.objects.get(id=consultation_id)
+    appointment = consultation.appointment
+
+    return render(request,'consultation/make_prescription.html',{
+        'doctor': doctor,
+        'consultation': consultation,
+        'appointment': appointment,
     })

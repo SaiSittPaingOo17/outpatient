@@ -11,7 +11,12 @@
                 <p>Diagnosis: <strong>{{ consultation.diag }}</strong></p>
                 <p>Appointed Time: <strong>{{ consultation.appointment.appointed_datetime }}</strong></p>
                 <p>Consulted Time: <strong>{{ consultation.created_at }}</strong></p>
-                <a href="{% url 'consultation:edit_consultation' consultation.id %}" class="btn btn-outline-success">Edit Consulting</a>
+
+                <div class="consultation-buttons d-flex justify-content-around">
+                    <a href="{% url 'consultation:edit_consultation' consultation.id %}" class="btn btn-outline-success">Edit Consulting</a>
+                    <a href="{% url 'consultation:make_prescription' consultation.id %}" class="btn btn-outline-info">Make Prescription</a>
+                </div>
+                
             </div>
         </div>
 
