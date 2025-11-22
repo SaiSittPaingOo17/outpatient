@@ -2,20 +2,36 @@
 {% block content %}
 
 <h3>Prescriptions for Consultation {{ consultation.id }}</h3>
+<h5>Patient ID: {{appointment.patient.id}}</h5>
+<h5>Patient Name: {{appointment.patient}}</h5>
+<h5>Consultation Date: {{ consultation.created_at}} </h5>
 
+<div class="row">  
 {% for p in prescriptions %}
-<div class="card mb-3 p-3">
-    <strong>Type:</strong> {{ p.prescription_type.prescription_type }} <br>
-    <strong>Details:</strong>
-    <p>{{ p.prescription }}</p>
+    <div class="col-12 col-lg-6 mb-3 d-flex"> 
+        <div class="card p-3 w-100 shadow-sm">
+            
+            <strong>Type:</strong> {{ p.prescription_type.prescription_type }} <br>
+            <strong>Details:</strong>
+            <p>{{ p.prescription }}</p>
 
-    <a href="{% url 'consultation:edit_prescription' p.id %}" class="btn btn-outline-primary btn-sm">Edit</a>
-    <a href="{% url 'consultation:delete_prescription' p.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this prescription?');"> Delete</a>
+            <div class="d-flex justify-content-center mt-2">
+                <a href="{% url 'consultation:edit_prescription' consultation.id %}" class="btn btn-outline-primary col-5 me-5">Edit</a>
+                <a href="{% url 'consultation:delete_prescription' p.id %}" class="btn btn-outline-danger col-5"
+                   onclick="return confirm('Are you sure you want to delete this prescription?');">
+                   Delete
+                </a>
+            </div>
 
-
-</div>
+        </div>
+    </div>
 {% empty %}
-<p>No prescriptions created yet.</p>
+    <p>No prescriptions created yet.</p>
 {% endfor %}
+</div>
+<div class="button-confirm text-center">
+   <a href="{% url 'consultation:show_consultation' %}" class="btn btn-success col-4">Confirm</a>
+</div>
+
 
 {% endblock %}

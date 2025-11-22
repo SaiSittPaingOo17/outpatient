@@ -43,9 +43,16 @@ class PrescriptionType(models.Model):
         return f'Prescription Type : {self.prescription_type}'
 
 class Prescription(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+    ]
+
     prescription_type = models.ForeignKey(PrescriptionType, on_delete=models.CASCADE)
     consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE)
     prescription = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -1,0 +1,67 @@
+{% extends 'labtech/layout.html' %}
+{% block content %}
+
+<h3>Update Laboratory Test Status</h3>
+
+<div class="card p-4 shadow-sm">
+
+    <!-- Patient Info -->
+    <p><strong>Patient ID:</strong> {{ prescription.consultation.appointment.patient.id }}</p>
+    <p><strong>Patient Name:</strong> {{ prescription.consultation.appointment.patient }}</p>
+
+    <hr>
+
+    <!-- Doctor Info -->
+    <p><strong>Doctor ID:</strong> {{ prescription.consultation.doctor.id }}</p>
+    <p><strong>Doctor Name:</strong> {{ prescription.consultation.doctor }}</p>
+
+    <hr>
+
+    <!-- Consultation Info -->
+    <p><strong>Consultation ID:</strong> {{ prescription.consultation.id }}</p>
+    <p><strong>Consultation Date:</strong> {{ prescription.consultation.created_at|date:"Y-m-d H:i" }}</p>
+
+    <hr>
+
+    <!-- Test Details -->
+    <p><strong>Lab Test Ordered:</strong></p>
+    <div class="border p-2 bg-light mb-3">
+        {{ prescription.prescription }}
+    </div>
+
+    <p>
+        <strong>Test Order Time:</strong> 
+        {{ prescription.created_at|date:"Y-m-d H:i" }}
+    </p>
+
+    <p>
+        <strong>Current Status:</strong>
+        {% if prescription.status == 'pending' %}
+            <span class="badge bg-secondary">Pending</span>
+        {% elif prescription.status == 'processing' %}
+            <span class="badge bg-warning text-dark">Processing</span>
+        {% elif prescription.status == 'completed' %}
+            <span class="badge bg-success">Completed</span>
+        {% endif %}
+    </p>
+
+    <hr>
+
+    <!-- Update Form -->
+    <form method="POST">
+        {% csrf_token %}
+
+        <label><strong>Update Status:</strong></label>
+        <select name="status" class="form-select mb-3">
+            <option value="pending" {% if prescription.status == "pending" %}selected{% endif %}>Pending</option>
+            <option value="processing" {% if prescription.status == "processing" %}selected{% endif %}>Processing</option>
+            <option value="completed" {% if prescription.status == "completed" %}selected{% endif %}>Completed</option>
+        </select>
+
+        <button class="btn btn-success">Save</button>
+        <a href="{% url 'labtech:show_tests' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+
+</div>
+
+{% endblock %}

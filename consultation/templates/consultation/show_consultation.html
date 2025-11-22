@@ -13,9 +13,27 @@
                 <p>Consulted Time: <strong>{{ consultation.created_at }}</strong></p>
 
                 <div class="consultation-buttons d-flex justify-content-around">
-                    <a href="{% url 'consultation:edit_consultation' consultation.id %}" class="btn btn-outline-success">Edit Consulting</a>
-                    <a href="{% url 'consultation:make_prescription' consultation.id %}" class="btn btn-outline-info">Make Prescription</a>
-                </div>
+
+                <!-- Always allowed: edit consultation -->
+                <a href="{% url 'consultation:edit_consultation' consultation.id %}" 
+                   class="btn btn-outline-success">
+                    Edit Consulting
+                </a>
+
+                <!-- Dynamic Prescription Button -->
+                {% if consultation.prescription_set.count > 0 %}
+                    <a href="{% url 'consultation:edit_prescription' consultation.id %}" 
+                       class="btn btn-outline-warning">
+                        Edit Prescription
+                    </a>
+                {% else %}
+                    <a href="{% url 'consultation:make_prescription' consultation.id %}" 
+                       class="btn btn-outline-info">
+                        Make Prescription
+                    </a>
+                {% endif %}
+
+            </div>
                 
             </div>
         </div>

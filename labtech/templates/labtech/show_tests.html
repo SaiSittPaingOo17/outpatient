@@ -1,0 +1,73 @@
+{% extends 'labtech/layout.html' %}
+{% block content %}
+
+<h3>Laboratory Test Orders</h3>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Test ID</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Consultation</th>
+            <th>Test Order</th>
+            <th>Status</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for test in lab_tests %}
+        <tr>
+            <!-- Prescription / Test ID -->
+            <td>{{ test.id }}</td>
+
+            <!-- Patient Info -->
+            <td>
+                <strong>ID:</strong> {{ test.consultation.appointment.patient.id }}<br>
+                <strong>Name:</strong> {{ test.consultation.appointment.patient }}
+            </td>
+
+            <!-- Doctor Info -->
+            <td>
+                <strong>ID:</strong> {{ test.consultation.doctor.id }}<br>
+                <strong>Name:</strong> {{ test.consultation.doctor }}
+            </td>
+
+            <!-- Consultation Info -->
+            <td>
+                <strong>ID:</strong> {{ test.consultation.id }}<br>
+                <strong>Date:</strong> {{ test.consultation.created_at|date:"Y-m-d H:i" }}
+            </td>
+
+            <!-- Test Description -->
+            <td>{{ test.prescription }}</td>
+
+            <!-- Status -->
+            <td>
+                {% if test.status == 'pending' %}
+                    <span class="badge bg-secondary">Pending</span>
+                {% elif test.status == 'processing' %}
+                    <span class="badge bg-warning text-dark">Processing</span>
+                {% elif test.status == 'completed' %}
+                    <span class="badge bg-success">Completed</span>
+                {% else %}
+                    <span class="badge bg-dark">{{ test.status }}</span>
+                {% endif %}
+                <br>
+                <small class="text-muted"><strong>Time:</strong> {{ test.created_at|date:"Y-m-d H:i" }}</small>
+            </td>
+
+            <!-- Update Button -->
+            <td>
+                <a href="{% url 'labtech:update_status' test.id %}"
+                   class="btn btn-warning btn-sm">Update</a>
+            </td>
+        </tr>
+        {% empty %}
+            <tr><td colspan="7">No lab tests available.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

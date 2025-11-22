@@ -1,0 +1,78 @@
+{% extends 'pharmacist/layout.html' %}
+{% block content %}
+
+<h3>Medication Orders</h3>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Prescription ID</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Consultation</th>
+            <th>Medication</th>
+            <th>Status</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for m in medications %}
+        <tr>
+            <!-- Prescription ID -->
+            <td>{{ m.id }}</td>
+
+            <!-- Patient Info -->
+            <td>
+                <strong>ID:</strong> {{ m.consultation.appointment.patient.id }} <br>
+                <strong>Name:</strong> {{ m.consultation.appointment.patient }}
+            </td>
+
+            <!-- Doctor Info -->
+            <td>
+                <strong>ID:</strong> {{ m.consultation.doctor.id }} <br>
+                <strong>Name:</strong> {{ m.consultation.doctor }}
+            </td>
+
+            <!-- Consultation Info -->
+            <td>
+                <strong>ID:</strong> {{ m.consultation.id }} <br>
+                <strong>Date:</strong> {{ m.consultation.created_at|date:"Y-m-d H:i" }}
+            </td>
+
+            <!-- Prescription Content -->
+            <td>{{ m.prescription }}</td>
+
+            <!-- Status with Colour and Time -->
+            <td>
+                {% if m.status == 'pending' %}
+                    <span class="badge bg-secondary">Pending</span>
+                {% elif m.status == 'processing' %}
+                    <span class="badge bg-warning text-dark">Processing</span>
+                {% elif m.status == 'completed' %}
+                    <span class="badge bg-success">Completed</span>
+                {% else %}
+                    <span class="badge bg-dark">{{ m.status }}</span>
+                {% endif %}
+                <br>
+                <small class="text-muted">
+                    <strong>Time:</strong> {{ m.created_at|date:"Y-m-d H:i" }}
+                </small>
+            </td>
+
+            <!-- Update Button -->
+            <td>
+                <a href="{% url 'pharmacist:update_status' m.id %}" 
+                   class="btn btn-outline-primary btn-sm">
+                    Update
+                </a>
+            </td>
+        </tr>
+
+        {% empty %}
+            <tr><td colspan="7">No medication prescriptions available.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

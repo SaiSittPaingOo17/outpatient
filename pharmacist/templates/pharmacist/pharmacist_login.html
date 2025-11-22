@@ -1,0 +1,19 @@
+{% extends 'pharmacist/layout.html' %}
+{% block content %}
+    <div class="row border border-3 mt-5 p-3 rounded">
+
+    <h1 class="text-center">Pharmacist Login</h1>
+    <form method="POST" action="{% url 'pharmacist:pharmacist_login' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="loginEmail" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="email" name="email">
+        </div>
+        <div class="mb-3">
+            <label for="loginPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    </div>
+{% endblock %}

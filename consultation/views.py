@@ -204,33 +204,80 @@ def make_prescription(request, consultation_id):
 
 @doctor_login_required
 def view_prescription(request, consultation_id):
+    doctor = request.doctor
     consultation = Consultation.objects.get(id=consultation_id)
+    appointment = consultation.appointment
     prescriptions = Prescription.objects.filter(consultation=consultation)
 
     return render(request, 'consultation/view_prescription.html', {
+        'doctor': doctor,
         'consultation': consultation,
+        'appointment' : appointment,
         'prescriptions': prescriptions
     })
 
 @doctor_login_required
-def edit_prescription(request, prescription_id):
-    prescription = Prescription.objects.get(id=prescription_id)
-    consultation = prescription.consultation
+def edit_prescription(request, consultation_id):
+    doctor = request.doctor
+    consultation = Consultation.objects.get(id=consultation_id)
+
+    # Get prescription types
+    lab_type = PrescriptionType.objects.get(prescription_type='laboratory')
+    med_type = PrescriptionType.objects.get(prescription_type='medication')
+
+    # Get existing prescriptions (may or may not exist)
+    lab_prescription = Prescription.objects.filter(
+        consultation=consultation, prescription_type=lab_type
+    ).first()
+
+    med_prescription = Prescription.objects.filter(
+        consultation=consultation, prescription_type=med_type
+    ).first()
 
     if request.method == "POST":
-        new_text = request.POST.get("prescription")
+        lab_text = request.POST.get("lab_prescri")
+        med_text = request.POST.get("med_prescri")
 
-        # Update and save
-        prescription.prescription = new_text
-        prescription.save()
+        #  LABORATORY
+        if lab_text and lab_text.strip():
+            if lab_prescription:
+                lab_prescription.prescription = lab_text.strip()
+                lab_prescription.save()
+            else:
+                Prescription.objects.create(
+                    prescription_type=lab_type,
+                    consultation=consultation,
+                    prescription=lab_text.strip()
+                )
+        else:
+            if lab_prescription:
+                lab_prescription.delete()
 
-        messages.success(request, "Prescription updated successfully!")
+        # MEDICATION
+        if med_text and med_text.strip():
+            if med_prescription:
+                med_prescription.prescription = med_text.strip()
+                med_prescription.save()
+            else:
+                Prescription.objects.create(
+                    prescription_type=med_type,
+                    consultation=consultation,
+                    prescription=med_text.strip()
+                )
+        else:
+            if med_prescription:
+                med_prescription.delete()
+
+        messages.success(request, "Prescriptions updated successfully!")
         return redirect('consultation:view_prescription', consultation_id=consultation.id)
 
     return render(request, 'consultation/edit_prescription.html', {
-        'prescription': prescription,
+        'doctor': doctor,
         'consultation': consultation,
+        'lab_prescription': lab_prescription,
+        'med_prescription': med_prescription,
     })
+
 
 @doctor_login_required
 def delete_prescription(request, prescription_id):
