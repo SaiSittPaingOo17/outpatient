@@ -6,6 +6,9 @@ from appointment.decorators import doctor_login_required
 from triage.models import Triage
 from appointment.models import Appointment
 from .models import Consultation
+from .models import PrescriptionType
+from .models import Prescription
+
 from .forms import ConsultationForm
 from django.contrib import messages
 
@@ -167,8 +170,74 @@ def make_prescription(request, consultation_id):
     consultation = Consultation.objects.get(id=consultation_id)
     appointment = consultation.appointment
 
-    return render(request,'consultation/make_prescription.html',{
+    if request.method == 'POST':
+        lab_text = request.POST.get('lab_prescri')
+        med_text = request.POST.get('med_prescri')
+
+        # Prescription types
+        lab_type = PrescriptionType.objects.get(prescription_type='laboratory')
+        med_type = PrescriptionType.objects.get(prescription_type='medication')
+
+        # laboratory prescription if provided
+        if lab_text and lab_text.strip() != "":
+            Prescription.objects.create(
+                prescription_type=lab_type,
+                consultation=consultation,
+                prescription=lab_text.strip()
+            )
+
+        # medication prescription if provided
+        if med_text and med_text.strip() != "":
+            Prescription.objects.create(
+                prescription_type=med_type,
+                consultation=consultation,
+                prescription=med_text.strip()
+            )
+
+        return redirect('consultation:view_prescription', consultation_id=consultation.id)
+
+    return render(request, 'consultation/make_prescription.html', {
         'doctor': doctor,
         'consultation': consultation,
         'appointment': appointment,
     })
+
+@doctor_login_required
+def view_prescription(request, consultation_id):
+    consultation = Consultation.objects.get(id=consultation_id)
+    prescriptions = Prescription.objects.filter(consultation=consultation)
+
+    return render(request, 'consultation/view_prescription.html', {
+        'consultation': consultation,
+        'prescriptions': prescriptions
+    })
+
+@doctor_login_required
+def edit_prescription(request, prescription_id):
+    prescription = Prescription.objects.get(id=prescription_id)
+    consultation = prescription.consultation
+
+    if request.method == "POST":
+        new_text = request.POST.get("prescription")
+
+        # Update and save
+        prescription.prescription = new_text
+        prescription.save()
+
+        messages.success(request, "Prescription updated successfully!")
+        return redirect('consultation:view_prescription', consultation_id=consultation.id)
+
+    return render(request, 'consultation/edit_prescription.html', {
+        'prescription': prescription,
+        'consultation': consultation,
+    })
+
+@doctor_login_required
+def delete_prescription(request, prescription_id):
+    prescription = Prescription.objects.get(id=prescription_id)
+    consultation_id = prescription.consultation.id
+    prescription.delete()
+
+    messages.success(request, "Prescription deleted successfully.")
+    return redirect('consultation:view_prescription', consultation_id=consultation_id)
+

@@ -1,43 +1,36 @@
 {% extends 'consultation/layout.html' %}
 {% block content %}
-{% if consultation %}
-    <div class="row mb-3">
-        Consultation
-        <ul>
-            <li><strong>Consultation ID:</strong> {{ consultation.id }}</li>
-            <li><strong>Appointment ID:</strong> {{ consultation.appointment.id }} </li>
-            <li><strong>Patient:</strong> {{ appointment.patient }}</li>
-            <li><strong>Appointment Time:</strong> {{ appointment.appointed_datetime }}</li>
-            <li><strong>Consulted Time:</strong> {{ consultation.created_at }}</li>
-        </ul>
-    </div>
 
-    <div class="lab-prescr border border-dark rounded p-3 mb-3 shadow">
-        <form action="" method="POST">
-            {% csrf_token %}
+<div class="row mb-3">
+    Consultation
+    <ul>
+        <li><strong>Consultation ID:</strong> {{ consultation.id }}</li>
+        <li><strong>Appointment ID:</strong> {{ consultation.appointment.id }}</li>
+        <li><strong>Patient:</strong> {{ appointment.patient }}</li>
+        <li><strong>Appointment Time:</strong> {{ appointment.appointed_datetime }}</li>
+        <li><strong>Consulted Time:</strong> {{ consultation.created_at }}</li>
+    </ul>
+</div>
+
+<div class="make_precription mb-3">
+    <form method="POST" action="{% url 'consultation:make_prescription' consultation.id %}">
+        {% csrf_token %}
+
+        <div class="lab-prescr border border-dark rounded p-3 mb-3 shadow">
             <h3 class="text-center">Laboratory Prescription</h3>
-            <div class="lab-content mb-2">
-                <textarea class="form-control bg-light" name="lab_prescri" id="lab_prescri" required></textarea>
-            </div>
-            <div class="prescribe-button text-center">
-                <button type="submit" class="btn btn-outline-success">Submit</button>
-            </div> 
-        </form>
-    </div>
-    
-    <div class="med-prescr border border-dark rounded p-3 mb-3 shadow">      
-        <form action="" method="POST">
-            {% csrf_token %}
+            <textarea class="form-control bg-light" name="lab_prescri"></textarea>
+        </div>
+
+        <div class="med-prescr border border-dark rounded p-3 mb-3 shadow">
             <h3 class="text-center">Medication</h3>
-            <div class="lab-content mb-2">
-                <textarea class="form-control bg-light" name="med_prescri" id="med_prescri" required></textarea>
-            </div>
-            <div class="prescribe-button text-center">
-                <button type="submit" class="btn btn-outline-success">Submit</button>
-            </div>
-        </form>
-    </div>
-{% endif %}
-    
+            <textarea class="form-control bg-light" name="med_prescri"></textarea>
+        </div>
+
+        <div class="prescribe-button text-center">
+            <button type="submit" class="btn btn-outline-success">Submit</button>
+        </div>
+    </form>
+</div>
+
 
 {% endblock %}
