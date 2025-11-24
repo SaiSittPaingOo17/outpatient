@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'consultation',
     'labtech',
     'pharmacist',
+    'billing',
+    'payment',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

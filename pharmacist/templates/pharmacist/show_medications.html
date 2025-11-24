@@ -43,7 +43,7 @@
             <!-- Prescription Content -->
             <td>{{ m.prescription }}</td>
 
-            <!-- Status with Colour and Time -->
+            <!-- Status -->
             <td>
                 {% if m.status == 'pending' %}
                     <span class="badge bg-secondary">Pending</span>
@@ -60,12 +60,30 @@
                 </small>
             </td>
 
-            <!-- Update Button -->
             <td>
+                <!-- Update button -->
                 <a href="{% url 'pharmacist:update_status' m.id %}" 
-                   class="btn btn-outline-primary btn-sm">
+                class="btn btn-outline-primary btn-sm">
                     Update
                 </a>
+
+                <!-- PAYMENT BUTTON -->
+                {% comment %}
+                    Check if all medication prescriptions for this consultation are completed.
+                {% endcomment %}
+
+                {% with stats=consult_stats.cid %}
+                    {% if stats.total == stats.completed and stats.total > 0 and stats.payment_id %}
+                        <a href="{% url 'payment:make_payment' stats.payment_id %}"
+                        class="btn btn-success btn-sm mt-2">
+                            Proceed to Payment
+                        </a>
+
+        
+                    {% endif %}
+
+                {% endwith %}
+            
             </td>
         </tr>
 

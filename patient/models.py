@@ -49,18 +49,18 @@ class Patient(models.Model):
     
     @property
     def age(self):
-        """Calculate current age from date of birth"""
+        # """Calculate current age from date of birth"""
         if self.date_of_birth:
             today = date.today()
             return today.year - self.date_of_birth.year - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
         return None
     
     def soft_delete(self):
-        """Soft delete the patient by setting status to inactive"""
+        # """Soft delete the patient by setting status to inactive"""
         self.status = 'inactive'
         self.save()
     
     def activate(self):
-        """Reactivate the patient"""
+        # """Reactivate the patient"""
         self.status = 'active'
         self.save()

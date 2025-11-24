@@ -20,7 +20,7 @@ class DoctorAvailability(models.Model):
 
     @property
     def duration(self):
-        """Calculate and return the duration of the availability slot"""
+        # """Calculate and return the duration of the availability slot"""
         if self.start_time and self.end_time:
             start_datetime = datetime.combine(date.today(), self.start_time)
             end_datetime = datetime.combine(date.today(), self.end_time)

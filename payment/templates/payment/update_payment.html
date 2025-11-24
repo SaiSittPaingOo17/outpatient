@@ -1,0 +1,33 @@
+{% extends "payment/layout.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="mb-3">Update Payment (ID: {{ payment.id }})</h3>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <p><strong>Patient:</strong> {{ payment.patient }}</p>
+            <p><strong>Total:</strong> {{ payment.total_amount }} Ks</p>
+            <p><strong>Current Paid:</strong> {{ payment.amount_paid }} Ks</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <button type="submit" class="btn btn-primary mt-3">
+                    Update Payment
+                </button>
+
+                <a href="{% url 'payment:make_payment' payment.id %}" class="btn btn-secondary mt-3">
+                    Back
+                </a>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

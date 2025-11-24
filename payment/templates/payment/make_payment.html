@@ -1,0 +1,126 @@
+{% extends "payment/layout.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="mb-3">
+        Payment Entry for {{ payment.patient.fname }} {{ payment.patient.lname }}
+    </h3>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5><strong>Patient Information</strong></h5>
+
+            <table class="table table-sm table-borderless mb-4">
+                <tbody>
+                    <tr>
+                        <th style="width: 25%">Patient Name:</th>
+                        <td>{{ payment.patient.fname }} {{ payment.patient.lname }}</td>
+                    </tr>
+                    <tr>
+                        <th>Patient ID:</th>
+                        <td>{{ payment.patient.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Gender:</th>
+                        <td>{{ payment.patient.gender }}</td>
+                    </tr>
+                    <tr>
+                        <th>Phone:</th>
+                        <td>{{ payment.patient.phone }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>{{ payment.patient.email }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr>
+
+            <!-- Consultation Info -->
+            <h5><strong>Consultation Information</strong></h5>
+            <p><strong>Consultation ID:</strong> {{ payment.consultation.id }}</p>
+            <p><strong>Doctor:</strong> Dr. {{ payment.consultation.doctor }}</p>
+
+            <hr>
+
+            <h5><strong>Prescribed Medications</strong></h5>
+            {% if medications %}
+                <ul>
+                {% for med in medications %}
+                    <li>{{ med.prescription }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No medications prescribed</p>
+            {% endif %}
+
+            <h5 class="mt-3"><strong>Lab Tests</strong></h5>
+            {% if tests %}
+                <ul>
+                {% for lab in tests %}
+                    <li>{{ lab.prescription }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No lab tests prescribed</p>
+            {% endif %}
+
+            <hr>
+
+            <!-- Payment Form -->
+            <form method="POST">
+            {% csrf_token %}
+
+            <h5 class="mb-3"><strong>Enter Fees Manually</strong></h5>
+
+            <table class="table table-bordered align-middle">
+                <tbody>
+
+                    <tr>
+                        <th style="width: 30%">Consultation Fee</th>
+                        <td>{{ form.consultation_fee }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Total Medication Fee</th>
+                        <td>{{ form.medication_fee }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Total Lab Test Fee</th>
+                        <td>{{ form.test_fee }}</td>
+                    </tr>
+
+                    <tr class="table-light">
+                        <th>Payment Method</th>
+                        <td>{{ form.payment_method }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Amount Paid</th>
+                        <td>{{ form.amount_paid }}</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <div class="mt-4 text-end">
+                <button type="submit" class="btn btn-success px-4">
+                    Submit Payment
+                </button>
+
+                <a href="{% url 'pharmacist:show_medications' %}" class="btn btn-secondary px-4">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

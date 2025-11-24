@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 
 from consultation.models import Prescription, PrescriptionType
+from payment.models import Payment
 
 # pharmacist authentication
 def pharmacist_login(request):
@@ -58,16 +59,37 @@ def dashboard(request):
 def show_medications(request):
     pharmacist = request.pharmacist
 
-    # Medication type
     med_type = PrescriptionType.objects.get(prescription_type='medication')
 
-    # All medication prescriptions
     medications = Prescription.objects.filter(prescription_type=med_type)
+
+    # Pre-calc completion stats for each consultation
+    consult_stats = {}
+
+    for med in medications:
+        cons = med.consultation
+
+        if cons.id not in consult_stats:
+            total = cons.prescription_set.count()
+            completed = cons.prescription_set.filter(status='completed').count()
+
+            consult_stats[cons.id] = {
+            "total": total,
+            "completed": completed,
+            "done": (total == completed and total > 0),
+            "payment_id": getattr(cons, "payment", None).id if hasattr(cons, "payment") else None
+        }
+        
+        
 
     return render(request, 'pharmacist/show_medications.html', {
         'pharmacist': pharmacist,
         'medications': medications,
+        'consult_stats': consult_stats,
     })
+
+
+
 
 @pharmacist_login_required
 def update_status(request, prescription_id):
@@ -75,12 +97,31 @@ def update_status(request, prescription_id):
     prescription = get_object_or_404(Prescription, id=prescription_id)
 
     if request.method == "POST":
-        prescription.status = request.POST.get("status")
+        status = request.POST.get("status")
+        prescription.status = status
         prescription.save()
-        messages.success(request, "Medication status updated successfully!")
+
+        consultation = prescription.consultation
+
+        payment, created = Payment.objects.get_or_create(
+            consultation=consultation,
+            defaults={
+                'patient': consultation.appointment.patient,
+                'appointment': consultation.appointment,
+                'total_amount': 0,
+                'amount_paid': 0,
+                'status': 'unpaid'
+            }
+        )
+
+        if status == "completed":
+            return HttpResponseRedirect(reverse('payment:make_payment', args=[payment.id]))
+
         return HttpResponseRedirect(reverse('pharmacist:show_medications'))
 
     return render(request, 'pharmacist/update_status.html', {
         'pharmacist': pharmacist,
         'prescription': prescription,
     })
+
+

@@ -29,6 +29,14 @@ class Consultation(models.Model):
 
     def __str__(self):
         return f"Consultated by {self.doctor} at {self.created_at}"
+    
+    def all_prescriptions_completed(self):
+        prescriptions = self.prescription_set.all()
+
+        if prescriptions.count() == 0:
+            return True
+
+        return all(p.status == "completed" for p in prescriptions)
 
 class PrescriptionType(models.Model):
     TYPE_CHOICES = [

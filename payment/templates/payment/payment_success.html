@@ -1,0 +1,21 @@
+{% extends "payment/layout.html" %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+
+    <h2 class="text-success">Payment Successful!</h2>
+
+    <p>Thank you. The payment has been recorded.</p>
+
+    <a href="{% url 'payment:payment_invoice' payment.id %}" 
+       class="btn btn-info mt-3">
+        Download Invoice
+    </a>
+
+    <a href="{% url 'pharmacist:show_medications' %}" 
+       class="btn btn-secondary mt-3">
+        Back to Pharmacy
+    </a>
+
+</div>
+{% endblock %}
