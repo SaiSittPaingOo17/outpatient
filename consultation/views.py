@@ -57,7 +57,7 @@ def record(request, triage_id):
             consultation.doctor = doctor
             consultation.appointment = appointment
             print(request.POST)
-            form.save()
+            consultation.save()
             messages.success(request, 'Consultation is finished.')
         
         else:

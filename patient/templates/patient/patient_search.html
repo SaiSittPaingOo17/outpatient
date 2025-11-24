@@ -1,0 +1,75 @@
+{% extends "appointment/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3 class="mb-4 fw-bold">Search</h3>
+
+    <!-- Search Form -->
+    <form method="GET" class="card p-3 shadow-sm mb-4">
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Search Type *</label>
+                <select name="search_type" class="form-select" required>
+                    <option value="">-- Choose --</option>
+                    <option value="appointment" {% if search_type == "appointment" %}selected{% endif %}>Appointment</option>
+                    <option value="consultation" {% if search_type == "consultation" %}selected{% endif %}>Consultation</option>
+                    <option value="medical_record" {% if search_type == "medical_record" %}selected{% endif %}>Medical Record</option>
+                    <option value="prescription" {% if search_type == "prescription" %}selected{% endif %}>Prescription</option>
+                    <option value="payment" {% if search_type == "payment" %}selected{% endif %}>Payment</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Doctor Name (Optional)</label>
+                <input type="text" name="search_doctor" value="{{ search_doctor }}" class="form-control" placeholder="e.g. John">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Date (Optional)</label>
+                <input type="date" name="search_date" value="{{ search_date }}" class="form-control">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Record ID (Optional)</label>
+                <input type="text" name="search_id" value="{{ search_id }}" class="form-control" placeholder="e.g. 12">
+            </div>
+        </div>
+
+        <div class="text-end mt-3">
+            <button type="submit" class="btn btn-primary px-4">Search</button>
+        </div>
+
+    </form>
+
+
+    <!-- Results -->
+    {% if results != None %}
+        <h4 class="fw-semibold mb-3">Results</h4>
+
+        {% if results %}
+            {% if search_type == "appointment" %}
+                {% include "patient/search_results/appointments.html" %}
+            
+            {% elif search_type in "consultation medical_record" %}
+                {% include "patient/search_results/consultations.html" %}
+
+            {% elif search_type == "prescription" %}
+                {% include "patient/search_results/prescriptions.html" %}
+
+            {% elif search_type == "payment" %}
+                {% include "patient/search_results/payments.html" %}
+
+            {% endif %}
+        {% else %}
+            <p class="text-muted">No results found.</p>
+        {% endif %}
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -2,14 +2,20 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect 
 from django.urls import reverse
 
+from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 
-from .models import Patient
-from .forms import PatientForm
-
 # decorators.py from appointment-app
 from appointment.decorators import patient_login_required
+
+# models
+from .models import Patient
+from .forms import PatientForm
+from payment.models import Payment
+from appointment.models import Appointment
+from triage.models import Triage
+from consultation.models import Consultation, Prescription
 
 # Register
 def patient_register(request):
@@ -176,4 +182,190 @@ def edit_profile(request):
         'created_at': created_at,
         'updated_at': updated_at,
     })
+
+# payment records
+@patient_login_required
+def patient_payments(request):
+    patient_id = request.session.get('patient_id')
+    patient = get_object_or_404(Patient, id=patient_id)
+
+    # Get all patient's payments
+    payments = Payment.objects.filter(patient=patient).order_by('-created_at')
+
+    return render(request, 'patient/patient_payments.html', {
+        'patient': patient,
+        'payments': payments
+    })
+
+# statistics
+@patient_login_required
+def patient_dashboard(request):
+
+    patient_id = request.session.get('patient_id')
+    patient = get_object_or_404(Patient, id=patient_id)
+
+    today = timezone.now().date()
+
+    # Appointments
+    upcoming_appointments = Appointment.objects.filter(
+        patient=patient,
+        appointed_datetime__date__gte=today
+    ).order_by('appointed_datetime')
+
+    past_appointments = Appointment.objects.filter(
+        patient=patient,
+        appointed_datetime__date__lt=today
+    ).order_by('-appointed_datetime')
+
+    # Consultations (visit records)
     
+    visit_records = Consultation.objects.filter(
+        appointment__patient=patient
+    ).order_by('-created_at')
+
+    consultations = Consultation.objects.filter(
+        appointment__patient=patient
+    ).order_by('-created_at')
+
+
+    # Prescriptions
+    prescriptions = Prescription.objects.filter(
+        consultation__appointment__patient=patient
+    ).order_by('-created_at')
+
+    # Payments
+    payments = Payment.objects.filter(
+        patient=patient
+    ).order_by('-created_at')
+
+    return render(request, 'patient/patient_dashboard.html', {
+        'patient': patient,
+        'upcoming_appointments': upcoming_appointments,
+        'past_appointments': past_appointments,
+        'visit_records': visit_records,
+        'prescriptions': prescriptions,
+        'payments': payments,
+        'consultations':consultations,
+    })
+
+# search
+@patient_login_required
+def patient_search(request):
+    patient_id = request.session.get('patient_id')
+    patient = get_object_or_404(Patient, id=patient_id)
+
+    search_type = request.GET.get('search_type', '')
+    search_date = request.GET.get('search_date', '')
+    search_doctor = request.GET.get('search_doctor', '')
+    search_id = request.GET.get('search_id', '')
+
+    results = None
+
+    # 1. Appointments
+    if search_type == "appointment":
+        qs = Appointment.objects.filter(patient=patient)
+
+        if search_date:
+            qs = qs.filter(appointed_datetime__date=search_date)
+        if search_doctor:
+            qs = qs.filter(doctor__fname__icontains=search_doctor) | qs.filter(doctor__lname__icontains=search_doctor)
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        results = qs.order_by('-appointed_datetime')
+
+    # 2. Consultation ONLY
+    elif search_type == "consultation":
+        qs = Consultation.objects.filter(appointment__patient=patient)
+
+        if search_date:
+            qs = qs.filter(created_at__date=search_date)
+        if search_doctor:
+            qs = qs.filter(doctor__fname__icontains=search_doctor) | qs.filter(doctor__lname__icontains=search_doctor)
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        consultations = qs.order_by('-created_at')
+
+        # triage linked consultation
+        for c in consultations:
+            c.triage = Triage.objects.filter(appointment=c.appointment).first()
+
+        results = consultations
+
+    # 3. Medical Record (Consultation + Triage)
+    elif search_type == "medical_record":
+        qs = Consultation.objects.filter(appointment__patient=patient)
+
+        if search_date:
+            qs = qs.filter(created_at__date=search_date)
+        if search_doctor:
+            qs = qs.filter(doctor__fname__icontains=search_doctor) | qs.filter(doctor__lname__icontains=search_doctor)
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        consultations = qs.order_by('-created_at')
+
+        # Attach triage data
+        for c in consultations:
+            c.triage = Triage.objects.filter(appointment=c.appointment).first()
+
+        results = consultations
+
+    # 4. Prescription
+    elif search_type == "prescription":
+        qs = Prescription.objects.filter(
+            consultation__appointment__patient=patient
+        ).select_related('consultation', 'consultation__doctor')
+
+        if search_date:
+            qs = qs.filter(created_at__date=search_date)
+
+        if search_doctor:
+            qs = qs.filter(
+                consultation__doctor__fname__icontains=search_doctor
+            ) | qs.filter(
+                consultation__doctor__lname__icontains=search_doctor
+            )
+
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        qs = qs.order_by('-created_at')
+
+        # Group prescriptions by consultation
+        grouped = []
+        seen = set()
+
+        for p in qs:
+            cons = p.consultation
+
+            if cons.id not in seen:
+                # attach triage + prescriptions
+                cons.triage = Triage.objects.filter(appointment=cons.appointment).first()
+                cons.prescriptions = Prescription.objects.filter(consultation=cons)
+                grouped.append(cons)
+                seen.add(cons.id)
+
+        results = grouped
+
+    # 5. Payment
+    elif search_type == "payment":
+        qs = Payment.objects.filter(patient=patient)
+
+        if search_date:
+            qs = qs.filter(created_at__date=search_date)
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        results = qs.order_by('-created_at')
+
+    return render(request, 'patient/patient_search.html', {
+        'patient': patient,
+        'results': results,
+        'search_type': search_type,
+        'search_date': search_date,
+        'search_doctor': search_doctor,
+        'search_id': search_id,
+    })
+

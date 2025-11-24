@@ -1,0 +1,22 @@
+<table class="table table-bordered">
+    <thead class="table-danger">
+        <tr>
+            <th>ID</th>
+            <th>Total (Ks)</th>
+            <th>Paid (Ks)</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pay in results %}
+        <tr>
+            <td>{{ pay.id }}</td>
+            <td>{{ pay.total_amount }}</td>
+            <td>{{ pay.amount_paid }}</td>
+            <td>{{ pay.status|capfirst }}</td>
+            <td>{{ pay.created_at|date:"Y-m-d H:i" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

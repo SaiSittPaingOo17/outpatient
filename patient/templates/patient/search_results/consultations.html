@@ -1,0 +1,75 @@
+<table class="table table-bordered table-striped align-middle">
+    <thead class="table-info">
+        <tr>
+            <th style="width: 20%">Consultation Info</th>
+            <th style="width: 40%">Triage Details</th>
+            <th style="width: 40%">Examination & Diagnosis</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for c in results %}
+        <tr>
+
+            <!-- Consultation Info -->
+            <td>
+                <p><strong>ID:</strong> {{ c.id }}</p>
+                <p><strong>Date:</strong> {{ c.created_at|date:"Y-m-d H:i" }}</p>
+                <p><strong>Doctor:</strong> Dr. {{ c.doctor.fname }} {{ c.doctor.lname }}</p>
+                <p><strong>Department:</strong> {{ c.doctor.department }}</p>
+
+                <p><strong>Status:</strong>
+                    {% if c.status == 'active' %}
+                        <span class="badge bg-primary">Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </p>
+            </td>
+
+            <!-- Triage Details -->
+            <td>
+                {% if c.triage %}
+                    <p><strong>Temperature:</strong> {{ c.triage.temperature }} °C</p>
+                    <p><strong>Pulse Rate:</strong> {{ c.triage.pulse_rate }} bpm</p>
+                    <p><strong>Respiratory Rate:</strong> {{ c.triage.resp_rate }} breaths/min</p>
+                    <p><strong>SpO₂:</strong> {{ c.triage.oxygen_saturation }}%</p>
+                    <p><strong>Blood Pressure:</strong> {{ c.triage.systolic_pressure }}/{{ c.triage.diastolic_pressure }} mmHg</p>
+                    <p><strong>Weight:</strong> {{ c.triage.weight }} kg</p>
+                    <p><strong>Height:</strong> {{ c.triage.height }} m</p>
+                    <p><strong>BMI:</strong> {{ c.triage.bmi }}</p>
+                    <p><strong>Blood Sugar:</strong> {{ c.triage.blood_sugar }}</p>
+                    <p><strong>Allergies:</strong> {{ c.triage.allergies }}</p>
+
+                    {% if c.triage.last_menstrual_period %}
+                        <p><strong>LMP:</strong> {{ c.triage.last_menstrual_period }}</p>
+                    {% endif %}
+
+                    <p><strong>Triage Notes:</strong> {{ c.triage.note }}</p>
+
+                {% else %}
+                    <p class="text-danger fw-bold">
+                        ⚠ Triage record missing (data inconsistency)
+                    </p>
+                {% endif %}
+            </td>
+
+            <!-- Examination & Diagnosis -->
+            <td>
+                <p><strong>Chief Complaint:</strong> {{ c.chief_comp }}</p>
+                <p><strong>Present Illness:</strong> {{ c.present_ill }}</p>
+                <p><strong>Past Medical:</strong> {{ c.past_med }}</p>
+                <p><strong>Past Surgical:</strong> {{ c.past_sur }}</p>
+                <p><strong>Medication History:</strong> {{ c.medica_his }}</p>
+                <p><strong>OB/GYN History:</strong> {{ c.og_his }}</p>
+                <p><strong>Family History:</strong> {{ c.fam_his }}</p>
+                <p><strong>Social History:</strong> {{ c.soc_his }}</p>
+                <p><strong>Physical Exam:</strong> {{ c.phy_exam }}</p>
+                <p><strong>Diagnosis:</strong> {{ c.diag }}</p>
+                <p><strong>Notes:</strong> {{ c.notes }}</p>
+            </td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

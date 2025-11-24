@@ -1,0 +1,64 @@
+{% extends "appointment/base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3 class="mb-4">Your Payments</h3>
+
+    {% if payments %}
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Invoice ID</th>
+                    <th>Consultation</th>
+                    <th>Total Amount (Ks)</th>
+                    <th>Amount Paid (Ks)</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Invoice</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for pay in payments %}
+                <tr>
+                    <td>{{ pay.id }}</td>
+
+                    <td>
+                        Consultation #{{ pay.consultation.id }}<br>
+                        Doctor: Dr. {{ pay.consultation.doctor.fname }} {{ pay.consultation.doctor.lname }}
+                    </td>
+
+                    <td>{{ pay.total_amount }}</td>
+                    <td>{{ pay.amount_paid }}</td>
+
+                    <td>
+                        {% if pay.status == 'paid' %}
+                            <span class="badge bg-success">Paid</span>
+                        {% elif pay.status == 'partial' %}
+                            <span class="badge bg-warning text-dark">Partially Paid</span>
+                        {% else %}
+                            <span class="badge bg-danger">Unpaid</span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ pay.created_at|date:"Y-m-d H:i" }}</td>
+
+                    <td>
+                        <a href="{% url 'payment:payment_invoice' pay.id %}" class="btn btn-sm btn-primary">
+                            View Invoice
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+    {% else %}
+        <p class="text-muted">You have no payment records yet.</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

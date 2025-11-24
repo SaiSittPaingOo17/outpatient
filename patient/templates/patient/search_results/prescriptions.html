@@ -1,0 +1,61 @@
+<table class="table table-bordered">
+    <thead class="table-warning">
+        <tr>
+            <th style="width: 20%">Consultation Info</th>
+            <th style="width: 40%">Prescriptions</th>
+            <th style="width: 20%">Status</th>
+            <th style="width: 20%">Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for c in results %}
+        <tr>
+
+            <!-- Consultation Info -->
+            <td>
+                <p><strong>ID:</strong> {{ c.id }}</p>
+                <p><strong>Date:</strong> {{ c.created_at|date:"Y-m-d H:i" }}</p>
+                <p><strong>Doctor:</strong> Dr. {{ c.doctor }}</p>
+                <p><strong>Department:</strong> {{ c.doctor.department }}</p>
+            </td>
+
+            <!-- Prescriptions under this consultation -->
+            <td>
+                {% if c.prescriptions %}
+                    <ul class="list-group">
+                    {% for p in c.prescriptions %}
+                        <li class="list-group-item">
+                            {{ p.prescription }}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No prescriptions.</p>
+                {% endif %}
+            </td>
+
+            <!-- Status -->
+            <td>
+                {% for p in c.prescriptions %}
+                    {% if p.status == "completed" %}
+                        <span class="badge bg-success d-block mb-1">Completed</span>
+                    {% elif p.status == "processing" %}
+                        <span class="badge bg-warning text-dark d-block mb-1">Processing</span>
+                    {% else %}
+                        <span class="badge bg-secondary d-block mb-1">Pending</span>
+                    {% endif %}
+                {% endfor %}
+            </td>
+
+            <!-- Dates -->
+            <td>
+                {% for p in c.prescriptions %}
+                    <span class="d-block">{{ p.created_at|date:"Y-m-d H:i" }}</span>
+                {% endfor %}
+            </td>
+
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

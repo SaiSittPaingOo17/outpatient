@@ -78,6 +78,22 @@
                             <i class="fas fa-calendar-alt"></i> My Appointments
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patient:patient_payments' %}">
+                            <i class="fas fa-calendar-alt"></i> My Payments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patient:patient_dashboard' %}">
+                            <i class="fas fa-calendar-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patient:patient_search' %}">
+                            <i class="fas fa-calendar-alt"></i> Search
+                        </a>
+                    </li>
+                    
                 </ul>
                 
                 <ul class="navbar-nav">
@@ -93,6 +109,7 @@
                             <li><a class="dropdown-item" href="{% url 'patient:patient_logout' %}">
                                 <i class="fas fa-sign-out-alt"></i> Logout
                             </a></li>
+                            
                         </ul>
                     </li>
                 </ul>
