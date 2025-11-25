@@ -1,0 +1,43 @@
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Test ID</th>
+            <th>Patient</th>
+            <th>Test</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for t in results %}
+        <tr>
+            <td>{{ t.id }}</td>
+
+            <td>
+                {{ t.consultation.appointment.patient.fname }}
+                {{ t.consultation.appointment.patient.lname }}
+            </td>
+
+            <td>{{ t.prescription }}</td>
+
+            <td>
+                <span class="badge
+                    {% if t.status == 'pending' %}bg-warning text-dark
+                    {% elif t.status == 'processing' %}bg-info
+                    {% else %}bg-success{% endif %}
+                ">
+                    {{ t.status }}
+                </span>
+            </td>
+
+            <td>{{ t.created_at }}</td>
+        </tr>
+
+        {% empty %}
+        <tr class="text-center">
+            <td colspan="5">No laboratory tests found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

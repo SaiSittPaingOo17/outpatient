@@ -24,19 +24,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'doctor:dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'appointment:availability' %}">My Availability</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'appointment:doctor_appointments' %}">My Appointments</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'doctor:dashboard' %}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'consultation:show_triage' %}">Patients</a>
                     </li>
                     <li class="nav-item">
                         <a class='nav-link' href="{% url 'consultation:show_consultation' %}">Consultations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class='nav-link' href="{% url 'doctor:doctor_search' %}">Search</a>
                     </li>
                 </ul>
                 

@@ -1,0 +1,68 @@
+{% extends 'pharmacist/layout.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold mb-4 ">Search Records</h2>
+
+    <form method="GET" action="{% url 'pharmacist:pharmacist_search' %}">
+        <div class="card shadow-sm border-1 p-4 rounded-4">
+
+            <div class="row g-3">
+
+                <!-- Search Type -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Search Type *</label>
+                    <select name="search_type" class="form-select" required>
+                        <option value="" disabled selected>Select Type</option>
+                        <option value="medication" {% if search_type == 'medication' %}selected{% endif %}>Medication</option>
+                        <option value="payment" {% if search_type == 'payment' %}selected{% endif %}>Payment</option>
+                    </select>
+                </div>
+
+                <!-- Date -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Date (Optional)</label>
+                    <input type="date" name="search_date" class="form-control"
+                           value="{{ search_date }}">
+                </div>
+
+                <!-- Patient Name -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Patient Name (Optional)</label>
+                    <input type="text" name="search_name" class="form-control"
+                           placeholder="e.g. John" value="{{ search_name }}">
+                </div>
+
+                <!-- Record ID -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Record ID (Optional)</label>
+                    <input type="number" name="search_id" class="form-control"
+                           placeholder="e.g. 12" value="{{ search_id }}">
+                </div>
+
+            </div>
+
+            <div class="text-end mt-4">
+                <button class="btn btn-primary px-4 py-2" type="submit">
+                    Search
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+    <hr class="my-4">
+
+    <!-- Results Section -->
+    <h3 class="fw-semibold mb-3">Results</h3>
+
+    {% if results_template %}
+        {% include results_template %}
+    {% else %}
+        <p class="text-muted">No results found.</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,19 +1,49 @@
 {% extends 'pharmacist/layout.html' %}
 {% block content %}
-    <div class="row border border-3 mt-5 p-3 rounded">
 
-    <h1 class="text-center">Pharmacist Login</h1>
-    <form method="POST" action="{% url 'pharmacist:pharmacist_login' %}">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="loginEmail" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="email" name="email">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg p-4 border-0" style="width: 100%; max-width: 420px; border-radius: 16px;">
+
+        <h2 class="text-center mb-4 fw-bold">Pharmacist Login</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} text-center py-2">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'pharmacist:pharmacist_login' %}">
+            {% csrf_token %}
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold" for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control form-control-lg"
+                       placeholder="Enter your email" required>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold" for="password">Password</label>
+                <input type="password" id="password" name="password"
+                       class="form-control form-control-lg" placeholder="Enter your password" required>
+            </div>
+
+            <!-- Login Button -->
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg" style="border-radius: 10px;">
+                    Login
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-3">
+            <small class="text-muted">Guardian Hospital – Pharmacist Portal</small>
         </div>
-        <div class="mb-3">
-            <label for="loginPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password">
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+
     </div>
+</div>
+
 {% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'labtech/layout.html' %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">Lab Technician Dashboard</h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6>Total Tests</h6>
+                <h2 class="text-primary">{{ total_tests }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6>Pending</h6>
+                <h2 class="text-warning">{{ pending_tests }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6>Processing</h6>
+                <h2 class="text-info">{{ processing_tests }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6>Completed</h6>
+                <h2 class="text-success">{{ completed_tests }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mt-5">
+        <h4 class="fw-semibold">Recent Tests</h4>
+
+        <table class="table table-bordered table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Test</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for t in recent_tests %}
+                <tr>
+                    <td>{{ t.id }}</td>
+                    <td>{{ t.consultation.appointment.patient.fname }} {{ t.consultation.appointment.patient.lname }}</td>
+                    <td>{{ t.prescription }}</td>
+                    <td>{{ t.status }}</td>
+                    <td>{{ t.created_at }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center">No recent tests.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

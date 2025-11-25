@@ -1,0 +1,58 @@
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Consultation ID</th>
+            <th>Patient</th>
+            <th>Medications</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% regroup results by consultation as grouped_consultations %}
+
+        {% for group in grouped_consultations %}
+        {% with c=group.grouper %}
+        <tr>
+            <td>{{ c.id }}</td>
+
+            <td>
+                {{ c.appointment.patient.fname }}
+                {{ c.appointment.patient.lname }}
+            </td>
+
+            <td>
+                {% for p in group.list %}
+                <div>
+                    - {{ p.prescription }}
+                </div>
+                {% endfor %}
+            </td>
+
+            <td>
+                {% for p in group.list %}
+                <div>
+                    <span class="badge 
+                        {% if p.status == 'pending' %}bg-warning text-dark
+                        {% elif p.status == 'processing' %}bg-info
+                        {% else %}bg-success
+                        {% endif %}">
+                        {{ p.status }}
+                    </span>
+                </div>
+                {% endfor %}
+            </td>
+
+            <td>{{ c.created_at }}</td>
+        </tr>
+        {% endwith %}
+        {% endfor %}
+
+        {% if results|length == 0 %}
+        <tr><td colspan="5" class="text-center">No medication found.</td></tr>
+        {% endif %}
+
+    </tbody>
+</table>

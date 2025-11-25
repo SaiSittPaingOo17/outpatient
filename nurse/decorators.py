@@ -18,8 +18,8 @@ def nurse_login_required(view_func):
             nurse = Nurse.objects.get(id=nurse_id)
             request.nurse = nurse
             return view_func(request, *args, **kwargs)
-        
         except Nurse.DoesNotExist:
+            
             messages.error(request, 'User Not Found. Please log in again.')
             return HttpResponseRedirect(reverse('nurse:nurse_login'))
         

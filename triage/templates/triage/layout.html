@@ -25,14 +25,15 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'nurse:nurse_dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'triage:show_appointments' %}">Appointments</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'triage:log' %}">Log</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'nurse:dashboard' %}">Dashboard</a>
-                    </li>
+                    
                 </ul>
                 
                 <ul class="navbar-nav">

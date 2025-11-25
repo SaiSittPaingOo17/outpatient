@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect 
 from django.urls import reverse
 
@@ -16,6 +16,9 @@ from payment.models import Payment
 from appointment.models import Appointment
 from triage.models import Triage
 from consultation.models import Consultation, Prescription
+
+def patient_home_redirect(request):
+    return redirect('patient:patient_dashboard')
 
 # Register
 def patient_register(request):

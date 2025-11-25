@@ -1,0 +1,55 @@
+{% extends 'labtech/layout.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold mb-4">Search Laboratory Tests</h2>
+
+    <form method="GET" action="{% url 'labtech:labtech_search' %}">
+        <div class="card shadow-sm p-4 rounded-4">
+
+            <div class="row g-3">
+
+                <!-- Search type (fixed) -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Search Type *</label>
+                    <input type="text" class="form-control" value="Laboratory Tests" disabled>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Date (Optional)</label>
+                    <input type="date" name="search_date" class="form-control"
+                           value="{{ search_date }}">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Patient Name (Optional)</label>
+                    <input type="text" name="search_name" class="form-control"
+                           placeholder="e.g. John" value="{{ search_name }}">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Test ID (Optional)</label>
+                    <input type="number" name="search_id" class="form-control"
+                           placeholder="e.g. 12" value="{{ search_id }}">
+                </div>
+
+            </div>
+
+            <div class="text-end mt-4">
+                <button class="btn btn-primary px-4 py-2" type="submit">
+                    Search
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+    <hr class="my-4">
+
+    <h3 class="fw-semibold mb-3">Results</h3>
+
+    {% include "labtech/search_results/tests.html" %}
+</div>
+
+{% endblock %}

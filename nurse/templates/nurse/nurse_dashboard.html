@@ -1,0 +1,96 @@
+{% extends 'nurse/layout.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold mb-4">Nurse Dashboard</h2>
+
+    <div class="row g-4">
+
+        <!-- Total Records -->
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6 class="fw-semibold">Total Triage Records</h6>
+                <h2 class="text-primary">{{ total_records }}</h2>
+            </div>
+        </div>
+
+        <!-- Pending -->
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6 class="fw-semibold">Pending</h6>
+                <h2 class="text-warning">{{ pending_records }}</h2>
+            </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6 class="fw-semibold">Completed</h6>
+                <h2 class="text-success">{{ completed_records }}</h2>
+            </div>
+        </div>
+
+        <!-- Due -->
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6 class="fw-semibold">Due</h6>
+                <h2 class="text-danger">{{ due_records }}</h2>
+            </div>
+        </div>
+
+        <!-- Today -->
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6 class="fw-semibold">Today's Triage</h6>
+                <h2 class="text-info">{{ today_records }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent Records -->
+    <div class="mt-5">
+        <h4 class="fw-semibold">Recent Triage</h4>
+
+        <table class="table table-bordered table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Temperature</th>
+                    <th>Blood Pressure</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for t in recent_records %}
+                <tr>
+                    <td>{{ t.id }}</td>
+                    <td>{{ t.patient.fname }} {{ t.patient.lname }}</td>
+                    <td>{{ t.temperature }} °C</td>
+                    <td>{{ t.systolic_pressure }}/{{ t.diastolic_pressure }} mmHg</td>
+                    <td>
+                        <span class="badge 
+                            {% if t.status == 'pending' %}bg-warning text-dark
+                            {% elif t.status == 'completed' %}bg-success
+                            {% else %}bg-danger
+                            {% endif %}
+                        ">
+                            {{ t.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ t.created_at }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center">No records found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

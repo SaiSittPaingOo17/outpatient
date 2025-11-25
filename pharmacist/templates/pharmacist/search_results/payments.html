@@ -1,0 +1,43 @@
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Payment ID</th>
+            <th>Patient</th>
+            <th>Consultation</th>
+            <th>Total Amount</th>
+            <th>Paid</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for pay in results %}
+        <tr>
+            <td>{{ pay.id }}</td>
+
+            <td>
+                {{ pay.patient.fname }} {{ pay.patient.lname }}
+            </td>
+
+            <td>{{ pay.consultation.id }}</td>
+
+            <td>{{ pay.total_amount }}</td>
+            <td>{{ pay.amount_paid }}</td>
+
+            <td>
+                <span class="badge 
+                    {% if pay.status == 'unpaid' %}bg-warning text-dark
+                    {% else %}bg-success
+                    {% endif %}">
+                    {{ pay.status }}
+                </span>
+            </td>
+
+            <td>{{ pay.created_at }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center">No payment records found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>

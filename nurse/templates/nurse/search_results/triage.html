@@ -3,7 +3,6 @@
         <tr>
             <th>ID</th>
             <th>Patient</th>
-            <th>Nurse</th>
             <th>Triage Details</th>
             <th>Date</th>
         </tr>
@@ -12,18 +11,13 @@
     <tbody>
         {% for t in results %}
         <tr>
+            <!-- ID -->
             <td>{{ t.id }}</td>
 
+            <!-- Patient -->
             <td>{{ t.patient.fname }} {{ t.patient.lname }}</td>
 
-            <td>
-                {% if t.nurse %}
-                    {{ t.nurse.fname }} {{ t.nurse.lname }}
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-
+            <!-- Triage Details -->
             <td>
                 <div><strong>Temperature:</strong> {{ t.temperature }} °C</div>
                 <div><strong>Pulse Rate:</strong> {{ t.pulse_rate }} bpm</div>
@@ -32,38 +26,38 @@
 
                 <div><strong>Weight:</strong> {{ t.weight }} kg</div>
                 <div><strong>Height:</strong> {{ t.height }} m</div>
-
                 <div><strong>BMI:</strong> {{ t.bmi }}</div>
 
                 {% if t.oxygen_saturation %}
-                <div><strong>SpO₂:</strong> {{ t.oxygen_saturation }}%</div>
+                    <div><strong>SpO₂:</strong> {{ t.oxygen_saturation }}%</div>
                 {% endif %}
 
                 {% if t.blood_sugar %}
-                <div><strong>Blood Sugar:</strong> {{ t.blood_sugar }}</div>
+                    <div><strong>Blood Sugar:</strong> {{ t.blood_sugar }}</div>
                 {% endif %}
 
                 {% if t.allergies %}
-                <div><strong>Allergies:</strong> {{ t.allergies }}</div>
+                    <div><strong>Allergies:</strong> {{ t.allergies }}</div>
                 {% endif %}
 
                 {% if t.last_menstrual_period %}
-                <div><strong>Last Menstrual Period:</strong> {{ t.last_menstrual_period }}</div>
+                    <div><strong>LMP:</strong> {{ t.last_menstrual_period }}</div>
                 {% endif %}
 
                 {% if t.note %}
-                <div><strong>Note:</strong> {{ t.note }}</div>
+                    <div><strong>Note:</strong> {{ t.note }}</div>
                 {% endif %}
 
                 <div><strong>Status:</strong> {{ t.get_status_display }}</div>
             </td>
 
+            <!-- Date -->
             <td>{{ t.created_at }}</td>
         </tr>
 
         {% empty %}
         <tr>
-            <td colspan="5" class="text-center">No triage records found.</td>
+            <td colspan="4" class="text-center">No triage records found.</td>
         </tr>
         {% endfor %}
     </tbody>

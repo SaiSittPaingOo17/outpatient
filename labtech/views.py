@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render,redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import LabTechnician
@@ -8,6 +8,12 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 
 from consultation.models import Prescription, PrescriptionType
+from triage.models import Triage
+
+from django.db.models import Q
+
+def labtech_home_redirect(request):
+    return redirect('labtech:labtech_dashboard')
 
 # labtechnician authentication
 def labtech_login(request):
@@ -45,12 +51,6 @@ def labtech_logout(request):
     messages.success(request, 'You have been logged out.')
     return HttpResponseRedirect(reverse('labtech:labtech_login'))
 
-@labtech_login_required
-def dashboard(request):
-    labtech = request.labtech
-    return render(request,'labtech/dashboard.html',{
-        'labtech': labtech,
-    })
 
 # Tests
 @labtech_login_required
@@ -82,4 +82,63 @@ def update_status(request, prescription_id):
     return render(request, 'labtech/update_status.html', {
         'labtech': labtech,
         'prescription': prescription,
+    })
+
+@labtech_login_required
+def labtech_dashboard(request):
+    labtech = request.labtech
+
+    lab_type = PrescriptionType.objects.get(prescription_type='laboratory')
+    tests = Prescription.objects.filter(prescription_type=lab_type)
+
+    total_tests = tests.count()
+    pending_tests = tests.filter(status='pending').count()
+    processing_tests = tests.filter(status='processing').count()
+    completed_tests = tests.filter(status='completed').count()
+
+    recent_tests = tests.order_by("-created_at")[:5]
+
+    return render(request, 'labtech/labtech_dashboard.html', {
+        'labtech': labtech,
+        'total_tests': total_tests,
+        'pending_tests': pending_tests,
+        'processing_tests': processing_tests,
+        'completed_tests': completed_tests,
+        'recent_tests': recent_tests,
+    })
+
+@labtech_login_required
+def labtech_search(request):
+    labtech = request.labtech
+
+    raw_date = request.GET.get("search_date", "").strip()
+    search_date = raw_date if raw_date else None
+    search_name = request.GET.get("search_name", "").strip()
+    search_id = request.GET.get("search_id", "").strip()
+
+    # only laboratory prescriptions
+    lab_type = PrescriptionType.objects.get(prescription_type="laboratory")
+    qs = Prescription.objects.filter(prescription_type=lab_type)
+
+    # filtering
+    if search_date:
+        qs = qs.filter(created_at__date=search_date)
+
+    if search_name:
+        qs = qs.filter(
+            Q(consultation__appointment__patient__fname__icontains=search_name) |
+            Q(consultation__appointment__patient__lname__icontains=search_name)
+        )
+
+    if search_id:
+        qs = qs.filter(id=search_id)
+
+    results = qs.order_by("-created_at")
+
+    return render(request, "labtech/labtech_search.html", {
+        "labtech": labtech,
+        "results": results,
+        "search_date": search_date,
+        "search_name": search_name,
+        "search_id": search_id,
     })

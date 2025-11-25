@@ -1,0 +1,61 @@
+{% extends 'pharmacist/layout.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 fw-bold">Pharmacist Dashboard</h2>
+
+    <div class="row g-4">
+
+        <!-- Total Prescriptions -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-1 rounded-4 p-3">
+                <h5 class="fw-semibold">Total Prescriptions</h5>
+                <h2 class="text-primary">{{ total_prescriptions }}</h2>
+            </div>
+        </div>
+
+        <!-- Pending -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-1 rounded-4 p-3">
+                <h5 class="fw-semibold">Pending</h5>
+                <h2 class="text-warning">{{ pending_prescriptions }}</h2>
+            </div>
+        </div>
+
+        <!-- Processing -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-1 rounded-4 p-3">
+                <h5 class="fw-semibold">In Progress</h5>
+                <h2 class="text-secondary">{{ processing_prescriptions }}</h2>
+            </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-1 rounded-4 p-3">
+                <h5 class="fw-semibold">Completed</h5>
+                <h2 class="text-success">{{ completed_prescriptions }}</h2>
+            </div>
+        </div>
+
+        <!-- Payments Created -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-1 rounded-4 p-3">
+                <h5 class="fw-semibold">Payments Generated</h5>
+                <h2 class="text-info">{{ payments_created }}</h2>
+            </div>
+        </div>
+
+        <!-- Payments Paid -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-1 rounded-4 p-3">
+                <h5 class="fw-semibold">Payments Completed</h5>
+                <h2 class="text-success">{{ payments_paid }}</h2>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

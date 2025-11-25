@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render,redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import Pharmacist
@@ -9,6 +9,9 @@ from django.contrib.auth.hashers import check_password
 
 from consultation.models import Prescription, PrescriptionType
 from payment.models import Payment
+
+def pharmacist_home_redirect(request):
+    return redirect('pharmacist:pharmacist_dashboard')
 
 # pharmacist authentication
 def pharmacist_login(request):
@@ -89,8 +92,6 @@ def show_medications(request):
     })
 
 
-
-
 @pharmacist_login_required
 def update_status(request, prescription_id):
     pharmacist = request.pharmacist
@@ -124,4 +125,104 @@ def update_status(request, prescription_id):
         'prescription': prescription,
     })
 
+@pharmacist_login_required
+def pharmacist_dashboard(request):
+    pharmacist = request.pharmacist
 
+    # Fetch prescriptions(medication only)
+    med_type = PrescriptionType.objects.get(prescription_type='medication')
+    prescriptions = Prescription.objects.filter(prescription_type=med_type)
+
+    # Stats
+    total_prescriptions = prescriptions.count()
+    pending_prescriptions = prescriptions.filter(status='pending').count()
+    processing_prescriptions = prescriptions.filter(status='processing').count()
+    completed_prescriptions = prescriptions.filter(status='completed').count()
+
+    # Payment stats — linked through consultation
+    payments = Payment.objects.all()
+    payments_created = payments.count()
+    payments_paid = payments.filter(status='paid').count()
+
+    return render(request, 'pharmacist/pharmacist_dashboard.html', {
+        'pharmacist': pharmacist,
+
+        'total_prescriptions': total_prescriptions,
+        'pending_prescriptions': pending_prescriptions,
+        'processing_prescriptions': processing_prescriptions,
+        'completed_prescriptions': completed_prescriptions,
+
+        'payments_created': payments_created,
+        'payments_paid': payments_paid,
+    })
+
+from django.db.models import Q
+from consultation.models import Prescription, PrescriptionType
+from payment.models import Payment
+
+
+@pharmacist_login_required
+def pharmacist_search(request):
+    pharmacist = request.pharmacist
+
+    search_type = request.GET.get("search_type", "").strip()
+    raw_date = request.GET.get("search_date", "").strip()
+    search_date = raw_date if raw_date else None
+    search_name = request.GET.get("search_name", "").strip()
+    search_id = request.GET.get("search_id", "").strip()
+
+    results = None
+    results_template = ""
+
+    # -----------------------------
+    # 1. Medication Search
+    # -----------------------------
+    if search_type == "medication":
+        med_type = PrescriptionType.objects.get(prescription_type='medication')
+        qs = Prescription.objects.filter(prescription_type=med_type)
+
+        if search_date:
+            qs = qs.filter(created_at__date=search_date)
+
+        if search_name:
+            qs = qs.filter(
+                Q(consultation__appointment__patient__fname__icontains=search_name) |
+                Q(consultation__appointment__patient__lname__icontains=search_name)
+            )
+
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        results = qs.order_by('-created_at')
+        results_template = "pharmacist/search_results/medications.html"
+
+    # -----------------------------
+    # 2. Payment Search
+    # -----------------------------
+    elif search_type == "payment":
+        qs = Payment.objects.all()
+
+        if search_date:
+            qs = qs.filter(created_at__date=search_date)
+
+        if search_name:
+            qs = qs.filter(
+                Q(patient__fname__icontains=search_name) |
+                Q(patient__lname__icontains=search_name)
+            )
+
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        results = qs.order_by('-created_at')
+        results_template = "pharmacist/search_results/payments.html"
+
+    return render(request, "pharmacist/pharmacist_search.html", {
+        "pharmacist": pharmacist,
+        "results": results,
+        "results_template": results_template,
+        "search_type": search_type,
+        "search_date": search_date,
+        "search_name": search_name,
+        "search_id": search_id,
+    })

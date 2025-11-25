@@ -1,0 +1,52 @@
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Consultation ID</th>
+            <th>Patient</th>
+            <th>Prescriptions</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% regroup results by consultation as consultation_groups %}
+
+        {% for group in consultation_groups %}
+        {% with c=group.grouper %}
+        <tr>
+            <!-- Consultation ID -->
+            <td>{{ c.id }}</td>
+
+            <!-- Patient -->
+            <td>
+                {{ c.appointment.patient.fname }}
+                {{ c.appointment.patient.lname }}
+            </td>
+
+            <!-- All prescriptions for this consultation -->
+            <td>
+                {% for p in group.list %}
+                    <div>
+                        <strong>{{ p.prescription_type.prescription_type|title }}:</strong>
+                        {{ p.prescription|default:"-" }}
+                        <span class="text-muted">({{ p.status }})</span>
+                    </div>
+                {% endfor %}
+            </td>
+
+            <!-- Date: earliest prescription or consultation date -->
+            <td>{{ c.created_at }}</td>
+
+        </tr>
+        {% endwith %}
+        {% endfor %}
+
+        {% if results|length == 0 %}
+        <tr>
+            <td colspan="4" class="text-center">No prescriptions found.</td>
+        </tr>
+        {% endif %}
+
+    </tbody>
+</table>

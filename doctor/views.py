@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render,redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
@@ -14,6 +14,9 @@ from consultation.models import Consultation, Prescription
 from triage.models import Triage
 from appointment.models import Appointment
 from django.db.models import Q
+
+def doctor_home_redirect(request):
+    return redirect('doctor:doctor_dashboard')
 
 # doctor authentication
 def doctor_login(request):
@@ -133,7 +136,10 @@ def doctor_search(request):
     doctor = request.doctor
 
     search_type = request.GET.get("search_type", "")
-    search_date = request.GET.get("search_date", "")
+    
+    raw_date = request.GET.get("search_date", "").strip()
+    search_date = raw_date if raw_date else None
+
     search_name = request.GET.get("search_name", "")
     search_id = request.GET.get("search_id", "")
 
@@ -165,7 +171,7 @@ def doctor_search(request):
     # 2. CONSULTATION SEARCH
     # -----------------------------
     elif search_type == "consultation":
-        qs = Consultation.objects.filter(doctor=doctor)
+        qs = Consultation.objects.filter(appointment__patient__in = Appointment.objects.filter(doctor=doctor).values('patient'))
 
         if search_date:
             qs = qs.filter(created_at__date=search_date)

@@ -1,0 +1,73 @@
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Patient</th>
+            <th>Consultation Details</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for c in results %}
+        <tr>
+            <td>{{ c.id }}</td>
+
+            <td>{{ c.appointment.patient.fname }} {{ c.appointment.patient.lname }}</td>
+
+            <td>
+                <div><strong>Chief Complaint:</strong> {{ c.chief_comp }}</div>
+                
+                {% if c.present_ill %}
+                <div><strong>Present Illness:</strong> {{ c.present_ill }}</div>
+                {% endif %}
+
+                {% if c.past_med %}
+                <div><strong>Past Medical:</strong> {{ c.past_med }}</div>
+                {% endif %}
+
+                {% if c.past_sur %}
+                <div><strong>Past Surgical:</strong> {{ c.past_sur }}</div>
+                {% endif %}
+
+                {% if c.medica_his %}
+                <div><strong>Medical History:</strong> {{ c.medica_his }}</div>
+                {% endif %}
+
+                {% if c.og_his %}
+                <div><strong>OB/GYN History:</strong> {{ c.og_his }}</div>
+                {% endif %}
+
+                {% if c.fam_his %}
+                <div><strong>Family History:</strong> {{ c.fam_his }}</div>
+                {% endif %}
+
+                {% if c.soc_his %}
+                <div><strong>Social History:</strong> {{ c.soc_his }}</div>
+                {% endif %}
+
+                {% if c.phy_exam %}
+                <div><strong>Physical Examination:</strong> {{ c.phy_exam }}</div>
+                {% endif %}
+
+                {% if c.diag %}
+                <div><strong>Diagnosis:</strong> {{ c.diag }}</div>
+                {% endif %}
+
+                {% if c.notes %}
+                <div><strong>Notes:</strong> {{ c.notes }}</div>
+                {% endif %}
+
+                <div><strong>Status:</strong> {{ c.status }}</div>
+            </td>
+
+            <td>{{ c.created_at }}</td>
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center">No consultations found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
