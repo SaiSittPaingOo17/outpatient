@@ -1,29 +1,19 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .models import Doctor
- 
+
 from django.contrib import messages
+from django.utils import timezone
 from django.contrib.auth.hashers import check_password, make_password
 
-# import decorators.py from appointment-app
 from appointment.decorators import doctor_login_required
 
-@doctor_login_required 
-def dashboard(request):
-    doctor_id = request.session.get('doctor_id')
-    
-    if not doctor_id: 
-        messages.error(request, 'Please log in first')
-        return HttpResponseRedirect(reverse('doctor:doctor_login'))
-    
-    try:
-        doctor = Doctor.objects.get(id=doctor_id)
-        context = {'doctor': doctor}
-        return render(request, 'doctor/dashboard.html', context)
-    except Doctor.DoesNotExist:
-        messages.error(request, 'Doctor not found')
-        return HttpResponseRedirect(reverse('doctor:doctor_login'))
+# models
+from .models import Doctor
+from consultation.models import Consultation, Prescription
+from triage.models import Triage
+from appointment.models import Appointment
+from django.db.models import Q
 
 # doctor authentication
 def doctor_login(request):
@@ -92,3 +82,182 @@ def doctor_profile(request):
 @doctor_login_required
 def edit_password(request):
     return render(request, 'doctor/edit_password.html')
+
+@doctor_login_required
+def doctor_dashboard(request):
+    doctor = request.doctor
+    today = timezone.now()
+
+    # Today date
+    now = timezone.now()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+    
+    # Today Appointments
+    today_appointments = Appointment.objects.filter(
+        doctor=doctor,
+        appointed_datetime__range=[today_start, today_end]
+    ).order_by('appointed_datetime')
+
+    # Upcoming and past appointments
+    upcoming_appointments = Appointment.objects.filter(
+        doctor=doctor,
+        appointed_datetime__gte=today,
+        status__in=['pending', 'confirmed']
+    ).order_by('appointed_datetime')
+
+    past_appointments = Appointment.objects.filter(
+        doctor=doctor,
+        appointed_datetime__lt=today
+    ).order_by('-appointed_datetime')
+
+    # Consultations (his patients)
+    consultations = Consultation.objects.filter(
+        doctor=doctor
+    ).select_related('appointment__patient').order_by('-created_at')
+
+    # Group prescriptions under each consultation
+    for c in consultations:
+        c.prescriptions = Prescription.objects.filter(consultation=c)
+
+    return render(request, 'doctor/doctor_dashboard.html', {
+        'today_appointments': today_appointments,
+        'doctor': doctor,
+        'upcoming_appointments': upcoming_appointments,
+        'past_appointments': past_appointments,
+        'consultations': consultations,
+    })
+
+@doctor_login_required
+def doctor_search(request):
+    doctor = request.doctor
+
+    search_type = request.GET.get("search_type", "")
+    search_date = request.GET.get("search_date", "")
+    search_name = request.GET.get("search_name", "")
+    search_id = request.GET.get("search_id", "")
+
+    results = None
+    results_template = ""
+
+    # -----------------------------
+    # 1. APPOINTMENT SEARCH
+    # -----------------------------
+    if search_type == "appointment":
+        qs = Appointment.objects.filter(doctor=doctor)
+
+        if search_date:
+            qs = qs.filter(appointed_datetime__date=search_date)
+
+        if search_name:
+            qs = qs.filter(
+                Q(patient__fname__icontains=search_name) |
+                Q(patient__lname__icontains=search_name)
+            )
+
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        results = qs.order_by("-appointed_datetime")
+        results_template = "doctor/search_results/appointments.html"
+
+    # -----------------------------
+    # 2. CONSULTATION SEARCH
+    # -----------------------------
+    elif search_type == "consultation":
+        qs = Consultation.objects.filter(doctor=doctor)
+
+        if search_date:
+            qs = qs.filter(created_at__date=search_date)
+
+        if search_name:
+            qs = qs.filter(
+                Q(appointment__patient__fname__icontains=search_name) |
+                Q(appointment__patient__lname__icontains=search_name)
+            )
+
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        results = qs.order_by("-created_at")
+        results_template = "doctor/search_results/consultations.html"
+
+    # -----------------------------
+    # 3. TRIAGE SEARCH (FIXED!)
+    # -----------------------------
+    elif search_type == "triage":
+        # FIXED: triage belongs to doctor through appointment
+        qs = Triage.objects.filter(appointment__doctor=doctor)
+
+        if search_date:
+            qs = qs.filter(created_at__date=search_date)
+
+        if search_name:
+            qs = qs.filter(
+                Q(patient__fname__icontains=search_name) |
+                Q(patient__lname__icontains=search_name) |
+                Q(nurse__fname__icontains=search_name) |
+                Q(nurse__lname__icontains=search_name)
+            )
+
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        results = qs.order_by("-created_at")
+        results_template = "doctor/search_results/triage.html"
+
+    # -----------------------------
+    # 4. MEDICAL RECORD SEARCH
+    # -----------------------------
+    elif search_type == "medical_record":
+        qs = Consultation.objects.filter(doctor=doctor)
+
+        if search_date:
+            qs = qs.filter(created_at__date=search_date)
+
+        if search_name:
+            qs = qs.filter(
+                Q(appointment__patient__fname__icontains=search_name) |
+                Q(appointment__patient__lname__icontains=search_name)
+            )
+
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        # Attach triage
+        for c in qs:
+            c.triage = Triage.objects.filter(appointment=c.appointment).first()
+
+        results = qs.order_by("-created_at")
+        results_template = "doctor/search_results/medical_records.html"
+
+    # -----------------------------
+    # 5. PRESCRIPTION SEARCH
+    # -----------------------------
+    elif search_type == "prescription":
+        qs = Prescription.objects.filter(consultation__doctor=doctor)
+
+        if search_date:
+            qs = qs.filter(created_at__date=search_date)
+
+        if search_name:
+            qs = qs.filter(
+                Q(consultation__appointment__patient__fname__icontains=search_name) |
+                Q(consultation__appointment__patient__lname__icontains=search_name)
+            )
+
+        if search_id:
+            qs = qs.filter(id=search_id)
+
+        results = qs.order_by("-created_at")
+        results_template = "doctor/search_results/prescriptions.html"
+
+    return render(request, "doctor/doctor_search.html", {
+        "doctor": doctor,
+        "results": results,
+        "results_template": results_template,
+        "search_type": search_type,
+        "search_date": search_date,
+        "search_name": search_name,
+        "search_id": search_id,
+    })

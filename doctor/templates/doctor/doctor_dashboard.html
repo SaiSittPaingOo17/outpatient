@@ -1,0 +1,192 @@
+{% extends 'appointment/base.html' %}
+{% block content %}
+    <h3 class="fw-bold mb-4">Welcome, Dr. {{ doctor.fname }} {{ doctor.lname }}</h3>
+    <!-- Today's Appointments -->
+    <h4 class="mt-4 text-primary fw-bold">Today's Appointments</h4>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-primary">
+            <tr>
+                <th>Time</th>
+                <th>Patient</th>
+                <th>Reason</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for appt in today_appointments %}
+            <tr class="table-info">
+                <td>{{ appt.appointed_datetime|date:"H:i" }}</td>
+                <td>{{ appt.patient }}</td>
+                <td>{{ appt.get_visit_reason_display }}</td>
+                <td>
+                    <span class="badge 
+                        {% if appt.status == 'confirmed' %} bg-success
+                        {% elif appt.status == 'pending' %} bg-warning text-dark
+                        {% else %} bg-secondary 
+                        {% endif %}
+                    ">
+                        {{ appt.get_status_display }}
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-muted">No appointments today.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Upcoming Appointments -->
+    <h4 class="mt-4">Upcoming Appointments</h4>
+    <table class="table table-bordered table-hover">
+        <thead class="table-info">
+            <tr>
+                <th>Date</th>
+                <th>Patient</th>
+                <th>Reason</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for appt in upcoming_appointments %}
+            <tr class="table-warning">
+                <td>{{ appt.appointed_datetime|date:"Y-m-d H:i" }}</td>
+                <td>{{ appt.patient }}</td>
+                <td>{{ appt.get_visit_reason_display }}</td>
+                <td><span class="badge bg-primary">{{ appt.get_status_display }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-muted">No upcoming appointments.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Past Appointments -->
+     <h4 class="mt-4">Past Appointments</h4>
+
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Date</th>
+                <th>Patient</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for appt in past_appointments %}
+            <tr>
+                <td>{{ appt.appointed_datetime|date:"Y-m-d H:i" }}</td>
+                <td>{{ appt.patient }}</td>
+                <td>{{ appt.get_status_display }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-muted">No past appointments.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Consultation Records -->
+    <h4 class="mt-5">Consultation Records</h4>
+
+    <table class="table table-striped">
+        <thead class="table-secondary">
+            <tr>
+                <th>Date</th>
+                <th>Patient</th>
+                <th>Chief Complaint</th>
+                <th>View</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for c in consultations %}
+            <tr>
+                <td>{{ c.created_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ c.appointment.patient }}</td>
+                <td>{{ c.chief_comp|truncatewords:6 }}</td>
+                <td>
+                    <a href="{% url 'consultation:edit_consultation' c.id %}" class="btn btn-sm btn-primary">
+                        Details
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-muted">No consultation records found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Prescriptions Made -->
+   <h4 class="mt-5 fw-bold">Prescriptions Issued</h4>
+
+    {% if consultations %}
+        {% for c in consultations %}
+
+            <div class="card mb-3 shadow-sm">
+
+                <div class="card-header bg-dark text-white">
+                    Consultation #{{ c.id }} — {{ c.created_at|date:"Y-m-d H:i" }}
+                </div>
+
+                <div class="card-body">
+                    <p><strong>Patient:</strong> {{ c.appointment.patient }}</p>
+                    <p><strong>Doctor:</strong> Dr. {{ c.doctor }}</p>
+                    <hr>
+
+                    <h6 class="fw-bold">Prescriptions</h6>
+
+                    {% if c.prescriptions %}
+                        <table class="table table-bordered mt-3">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Prescription</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for p in c.prescriptions %}
+                                <tr>
+                                    <td>{{ p.prescription }}</td>
+
+                                    <td>
+                                        {{ p.prescription_type.prescription_type|capfirst }}
+                                    </td>
+
+                                    <td>
+                                        {% if p.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% elif p.status == 'processing' %}
+                                            <span class="badge bg-warning text-dark">Processing</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Pending</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>{{ p.created_at|date:"Y-m-d H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No prescriptions for this consultation.</p>
+                    {% endif %}
+
+                </div>
+            </div>
+
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No consultations found.</p>
+    {% endif %}
+
+
+
+
+
+{% endblock %}

@@ -11,6 +11,7 @@ from .models import Prescription
 
 from .forms import ConsultationForm
 from django.contrib import messages
+from django.utils import timezone
 
 @doctor_login_required
 def index(request):
@@ -116,6 +117,13 @@ def edit_consultation(request, consultation_id):
     appointment = consultation.appointment
     doctor = request.doctor
 
+    # ⛔ BLOCK EDITING IF LOCKED
+    if consultation.is_locked:
+        messages.error(request,
+            "This consultation cannot be edited because prescriptions have already been issued."
+        )
+        return redirect(request.META.get('HTTP_REFERER', 'consultation:show_consultation'))
+
     if request.method == 'POST':
         form = ConsultationForm(request.POST, instance=consultation)
 
@@ -123,47 +131,29 @@ def edit_consultation(request, consultation_id):
             consultation = form.save(commit=False)
             consultation.doctor = doctor
             consultation.appointment = appointment
-            # print(request.POST)
+            consultation.is_edited = True
+            consultation.last_edited_at = timezone.now()
             consultation.save()
+
             messages.success(request,'Consultation is updated.')
             return HttpResponseRedirect(reverse('consultation:show_consultation'))
-        else:
-            chief_comp = request.POST['chief_comp']
-            present_ill = request.POST['present_ill']
-            past_med = request.POST['past_med']
-            past_sur = request.POST['past_sur']
-            medica_his = request.POST['medica_his']
-            og_his = request.POST['og_his']
-            fam_his = request.POST['fam_his']
-            soc_his = request.POST['soc_his']
-            phy_exam = request.POST['phy_exam']
-            diag = request.POST['diag']
-            notes = request.POST['notes']
 
+        else:
             messages.warning(request, 'Please fill the form completely')
-            return render(request, 'consultation/edit_consultation.html',{
-                'chief_comp': chief_comp,
-                'present_ill': present_ill,
-                'past_med': past_med,
-                'past_sur': past_sur,
-                'medica_his': medica_his,
-                'og_his': og_his,
-                'fam_his': fam_his,
-                'soc_his': soc_his,
-                'phy_exam': phy_exam,
-                'diag': diag,
-                'notes': notes,
-            })   
+
     else:
         form = ConsultationForm(instance=consultation)
 
     return render(request, 'consultation/edit_consultation.html', {
-    'doctor': doctor,
-    'consultation': consultation,
-    'appointment': appointment,
-    'form': form,
+        'doctor': doctor,
+        'consultation': consultation,
+        'appointment': appointment,
+        'form': form,
+        'fallback_url': reverse('consultation:show_consultation'),
     })
 
+
+@doctor_login_required
 @doctor_login_required
 def make_prescription(request, consultation_id):
     doctor = request.doctor
@@ -174,25 +164,31 @@ def make_prescription(request, consultation_id):
         lab_text = request.POST.get('lab_prescri')
         med_text = request.POST.get('med_prescri')
 
-        # Prescription types
         lab_type = PrescriptionType.objects.get(prescription_type='laboratory')
         med_type = PrescriptionType.objects.get(prescription_type='medication')
 
-        # laboratory prescription if provided
-        if lab_text and lab_text.strip() != "":
+        created_any = False
+
+        if lab_text and lab_text.strip():
             Prescription.objects.create(
                 prescription_type=lab_type,
                 consultation=consultation,
                 prescription=lab_text.strip()
             )
+            created_any = True
 
-        # medication prescription if provided
-        if med_text and med_text.strip() != "":
+        if med_text and med_text.strip():
             Prescription.objects.create(
                 prescription_type=med_type,
                 consultation=consultation,
                 prescription=med_text.strip()
             )
+            created_any = True
+
+        # 🔒 Lock only after a prescription was actually created
+        if created_any:
+            consultation.is_locked = True
+            consultation.save()
 
         return redirect('consultation:view_prescription', consultation_id=consultation.id)
 
@@ -201,6 +197,7 @@ def make_prescription(request, consultation_id):
         'consultation': consultation,
         'appointment': appointment,
     })
+
 
 @doctor_login_required
 def view_prescription(request, consultation_id):
@@ -221,11 +218,9 @@ def edit_prescription(request, consultation_id):
     doctor = request.doctor
     consultation = Consultation.objects.get(id=consultation_id)
 
-    # Get prescription types
     lab_type = PrescriptionType.objects.get(prescription_type='laboratory')
     med_type = PrescriptionType.objects.get(prescription_type='medication')
 
-    # Get existing prescriptions (may or may not exist)
     lab_prescription = Prescription.objects.filter(
         consultation=consultation, prescription_type=lab_type
     ).first()
@@ -238,7 +233,7 @@ def edit_prescription(request, consultation_id):
         lab_text = request.POST.get("lab_prescri")
         med_text = request.POST.get("med_prescri")
 
-        #  LABORATORY
+        # Update or delete lab prescription
         if lab_text and lab_text.strip():
             if lab_prescription:
                 lab_prescription.prescription = lab_text.strip()
@@ -253,7 +248,7 @@ def edit_prescription(request, consultation_id):
             if lab_prescription:
                 lab_prescription.delete()
 
-        # MEDICATION
+        # Update or delete medication prescription
         if med_text and med_text.strip():
             if med_prescription:
                 med_prescription.prescription = med_text.strip()

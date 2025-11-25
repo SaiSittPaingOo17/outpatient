@@ -27,6 +27,11 @@ class Consultation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(default=timezone.now)
 
+    # logic to prevent editing medical records
+    is_locked = models.BooleanField(default=False)      # Locked after prescription
+    is_edited = models.BooleanField(default=False)      # Has been modified before
+    last_edited_at = models.DateTimeField(null=True, blank=True)  # Timestamp
+
     def __str__(self):
         return f"Consultated by {self.doctor} at {self.created_at}"
     
