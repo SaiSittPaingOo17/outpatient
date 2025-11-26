@@ -62,10 +62,17 @@
 
             <td>
                 <!-- Update button -->
-                <a href="{% url 'pharmacist:update_status' m.id %}" 
-                class="btn btn-outline-primary btn-sm">
-                    Update
-                </a>
+                {% if m.status != 'completed' %}
+                    <a href="{% url 'pharmacist:update_status' m.id %}" 
+                    class="btn btn-outline-primary btn-sm">
+                        Update
+                    </a>
+                {% else %}
+                    <button class="btn btn-secondary btn-sm" disabled>
+                        Completed
+                    </button>
+                {% endif %}
+
 
                 <!-- PAYMENT BUTTON -->
                 {% comment %}

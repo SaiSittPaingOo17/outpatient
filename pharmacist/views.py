@@ -64,7 +64,7 @@ def show_medications(request):
 
     med_type = PrescriptionType.objects.get(prescription_type='medication')
 
-    medications = Prescription.objects.filter(prescription_type=med_type)
+    medications = Prescription.objects.filter(prescription_type=med_type).order_by('-created_at')
 
     # Pre-calc completion stats for each consultation
     consult_stats = {}

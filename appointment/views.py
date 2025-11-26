@@ -4,6 +4,8 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.db.models import Q
+
 # datetime
 from django.utils import timezone
 from datetime import timedelta, datetime, date as date_func
@@ -153,31 +155,33 @@ def cancel_appointment_doctor(request, appointment_id):
 # -----------------------------
 @patient_login_required
 def search_doctors(request):
-    query = request.GET.get('q')  # Name search
-    department = request.GET.get('department')  # Department search
-    
-    # Get patient info from session
+    query = request.GET.get('q', '').strip()
+
+    # Get patient
     patient_id = request.session.get('patient_id')
     patient = get_object_or_404(Patient, id=patient_id)
-    
+
     # All active doctors
     doctors = Doctor.objects.filter(status='active').select_related('department')
-    
-    # Filter by name
+
     if query:
-        doctors = doctors.filter(fname__icontains=query)
-    
-    # Filter by department name
-    if department:
-        doctors = doctors.filter(department__dep_name__icontains=department)
-    
-    # Get all active departments
-    all_departments = Department.objects.filter(status='active').values_list('dep_name', flat=True).distinct().order_by('dep_name')
-    
+        doctors = doctors.filter(
+            Q(fname__icontains=query) |
+            Q(lname__icontains=query) |
+            Q(email__icontains=query) |
+            Q(specialisation__icontains=query) |
+            Q(department__dep_name__icontains=query) |
+            Q(fname__icontains=query.split(" ")[0], lname__icontains=" ".join(query.split(" ")[1:]))  # full name search
+        )
+
+    # For dropdown (optional)
+    all_departments = Department.objects.filter(status='active') \
+                                        .values_list('dep_name', flat=True) \
+                                        .order_by('dep_name')
+
     return render(request, 'appointment/search_doctors.html', {
         'doctors': doctors,
         'all_departments': all_departments,
-        'selected_department': department,
         'search_query': query,
         'patient': patient
     })

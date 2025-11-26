@@ -5,8 +5,11 @@ from xhtml2pdf import pisa
 
 from .models import Payment
 from .forms import PaymentForm
+from pharmacist.decorators import pharmacist_login_required
 
+@pharmacist_login_required
 def make_payment(request, payment_id):
+    pharmacist = request.pharmacist
     payment = get_object_or_404(Payment, id=payment_id)
 
     # Get prescriptions for display
@@ -38,13 +41,14 @@ def make_payment(request, payment_id):
         form = PaymentForm(instance=payment)
 
     return render(request, "payment/make_payment.html", {
+        'pharmacist': pharmacist,
         "payment": payment,
         "form": form,
         "medications": medication_list,
         "tests": test_list,
     })
 
-
+@pharmacist_login_required
 def payment_invoice_pdf(request, payment_id):
     payment = get_object_or_404(Payment, id=payment_id)
     template_path = 'payment/invoice.html'
@@ -63,6 +67,7 @@ def payment_invoice_pdf(request, payment_id):
 
     return response
 
+@pharmacist_login_required
 def payment_success(request, payment_id):
     payment = get_object_or_404(Payment, id=payment_id)
     return render(request, "payment/payment_success.html", {"payment": payment})

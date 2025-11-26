@@ -92,10 +92,12 @@ def fill_triage(request, appointment_id):
 @nurse_login_required
 def log(request):
     nurse = request.nurse
-    triages = Triage.objects.all()
-    print(triages)
 
-    return render(request,'triage/log.html',{
+    triages = Triage.objects.filter(nurse=nurse).select_related(
+        'appointment', 'patient', 'department'
+    ).order_by('-created_at')
+
+    return render(request, 'triage/log.html', {
         'triages': triages,
         'nurse': nurse,
     })

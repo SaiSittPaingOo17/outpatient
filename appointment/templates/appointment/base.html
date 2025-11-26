@@ -20,7 +20,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'doctor:dashboard' %}">Dashboard</a>
+                        <a class="nav-link" href="{% url 'doctor:doctor_dashboard' %}">Dashboard</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'appointment:availability' %}">My Availability</a>
@@ -125,7 +125,7 @@
         {% for message in messages %}
         {% if message.tags == 'success' %}
           <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>Success!</strong> {{message}}
+            <strong>{{message}}</strong> {{message}}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         {% elif message.tags == 'error' %}
