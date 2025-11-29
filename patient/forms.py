@@ -1,5 +1,6 @@
 from django import forms
 from .models import Patient
+from django.contrib.auth.hashers import make_password
 
 class PatientForm(forms.ModelForm):
     class Meta:
@@ -21,3 +22,7 @@ class PatientForm(forms.ModelForm):
                     'password': forms.PasswordInput(),  # Hides password input
                     'date_of_birth': forms.DateInput(attrs={'type': 'date'}),  # HTML5 date picker
                 }
+        
+    def clean_password(self):
+        password = self.cleaned_data['password']
+        return make_password(password)

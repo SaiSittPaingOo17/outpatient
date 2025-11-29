@@ -37,7 +37,8 @@ class Patient(models.Model):
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES, blank=True, null=True)
     marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
-    email = models.EmailField(max_length=64)
+    email = models.EmailField(max_length=64,unique=True)
+
     address = models.TextField(blank=True, null=True)
     password = models.CharField(max_length=128)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
