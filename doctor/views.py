@@ -53,34 +53,38 @@ def doctor_logout(request):
     return HttpResponseRedirect(reverse('doctor:doctor_login'))
 
 # doctor profile
-@doctor_login_required
 def doctor_profile(request):
     doctor_id = request.session.get('doctor_id')
     doctor = get_object_or_404(Doctor, id=doctor_id)
+    return render(request, 'doctor/profile.html', {'doctor': doctor})
 
-    department = doctor.department
-    fname = doctor.fname
-    lname = doctor.lname
-    license = doctor.license
-    specialisation = doctor.specialisation
-    email = doctor.email
-    phone = doctor.phone
-    address = doctor.address
-    created_at = doctor.created_at
-    updated_at = doctor.updated_at 
+def doctor_change_password(request):
+    doctor_id = request.session.get('doctor_id')
+    doctor = get_object_or_404(Doctor, id=doctor_id)
 
-    return render(request, 'doctor/doctor_profile.html', {
-        'department': department,
-        'fname': fname,
-        'lname': lname,
-        'license': license,
-        'specialisation': specialisation,
-        'email': email,
-        'phone': phone,
-        'address': address,
-        'created_at': created_at,
-        'updated_at': updated_at,
-    })
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password     = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # Check current password
+        if not doctor.user.check_password(current_password):
+            messages.error(request, "Current password is incorrect.")
+            return redirect('doctor:change_password')
+
+        # Check new password match
+        if new_password != confirm_password:
+            messages.error(request, "New passwords do not match.")
+            return redirect('doctor:change_password')
+
+        # Save new password
+        doctor.user.set_password(new_password)
+        doctor.user.save()
+
+        messages.success(request, "Password updated successfully.")
+        return redirect('doctor:profile')
+
+    return render(request, 'doctor/change_password.html', {'doctor': doctor})
 
 @doctor_login_required
 def edit_password(request):

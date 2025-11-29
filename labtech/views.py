@@ -51,6 +51,40 @@ def labtech_logout(request):
     messages.success(request, 'You have been logged out.')
     return HttpResponseRedirect(reverse('labtech:labtech_login'))
 
+@labtech_login_required
+def labtech_profile(request):
+    labtech_id = request.session.get('labtech_id')
+    labtech = get_object_or_404(LabTechnician, id=labtech_id)
+    return render(request, 'labtech/profile.html', {'labtech': labtech})
+
+@labtech_login_required
+def labtech_change_password(request):
+    labtech_id = request.session.get('labtech_id')
+    labtech = get_object_or_404(LabTechnician, id=labtech_id)
+
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password     = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # Validate current password
+        if not labtech.user.check_password(current_password):
+            messages.error(request, "Current password is incorrect.")
+            return redirect('labtech:change_password')
+
+        # Check new password match
+        if new_password != confirm_password:
+            messages.error(request, "New passwords do not match.")
+            return redirect('labtech:change_password')
+
+        # Save new password
+        labtech.user.set_password(new_password)
+        labtech.user.save()
+
+        messages.success(request, "Password updated successfully.")
+        return redirect('labtech:profile')
+
+    return render(request, 'labtech/change_password.html', {'labtech': labtech})
 
 # Tests
 @labtech_login_required
